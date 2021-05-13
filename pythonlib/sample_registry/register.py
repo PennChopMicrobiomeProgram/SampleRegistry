@@ -162,6 +162,7 @@ class SampleRegistry(object):
     machines = [
         "Illumina-MiSeq",
         "Illumina-HiSeq",
+        "Illumina-NovaSeq",
     ]
     kits = [
         "Nextera XT"

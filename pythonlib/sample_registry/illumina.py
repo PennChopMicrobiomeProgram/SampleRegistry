@@ -4,7 +4,7 @@ import re
 
 
 class IlluminaFastq(object):
-    machine_types = {"D": "Illumina-HiSeq", "M": "Illumina-MiSeq"}
+    machine_types = {"D": "Illumina-HiSeq", "M": "Illumina-MiSeq", "A": "Illumina-NovaSeq"}
 
     def __init__(self, f):
         self.file = f
