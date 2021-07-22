@@ -1,104 +1,73 @@
-sample_type	host_associated	description
-Air swab	0	
-Amnoitic fluid	1	
-Bacterial strain	0	
-BAL	1	
-BAL fluid	1	
-Bedding	0	
-Biopsy	1	
-Bioreactor	0	
-Blank swab	0	
-Blood	1	
-Breast milk	1	
-Breast swab	1	
-Bronchoscope post-wash	1	
-Bronchoscope pre-wash	1	
-Bronchoscope tip	1	
-Buffer	0	
-Cecum	1	
-Cell lysate	1	
-Cervical swab	1	
-Cheek swab	1	
-Crop	1	
-Cultured cells	0	
-Dental plaque	1	
-Distal small bowel	1	
-Duodenum	1	
-Dust	0	
-Elution buffer	0	
-Empty well	0	
-Endometrial swab	1	
-Environmental blank	0	
-Environmental swab	0	
-Esophageal biopsy	1	
-Esophagus	1	
-Fecal inoculum	1	
-Feces	1	Human and animal fecal material.
-Feed	0	
-Fistula	1	
-Fistula swab	1	
-Fly food	0	
-Fruit fly	1	
-Ileal chyme	1	
-Ileal swab	1	
-Ileostomy	1	
-In vivo cells	0	
-Kveim reagent	0	
-Lab water	0	
-Lumenal contents cecum	1	
-Lumenal contents colon	1	
-Macular Retina	1	
-Meconium	1	
-Medium	0	
-Microbial culture	0	
-Mock community	0	
-Mock DNA	0	
-Mouse chow	0	
-Mucosa cecum	1	
-Mucosa colon	1	
-Mucosa small bowel	1	
-Mucosal contents colon	1	
-Nasal swab	1	
-Nasopharngeal swab	1	
-Nasopharyngeal swab	1	
-Oral swab	1	
-Oral wash	1	
-Oropharyngeal swab	1	
-Oropharynx	1	
-Ostomy fluid	1	
-Ostomy swab	1	
-Pancreatic fluid	1	
-PCR water	0	
-Peripheral retina	1	
-Placenta	1	
-Plaque biofilms	1	
-Plasma	1	
-Proximal small bowel	1	
-Rectal biopsy	1	
-Rectal swab	1	"We have observed that results are sensitive to exact collection method employed, please include notes in publication."
-Saline	0	
-Saliva	1	
-Sediment	0	
-Serum	1	
-SHIME ascending	0	First compartment of SHIME apparatus.
-SHIME descending	0	Third comartment of SHIME apparatus.
-SHIME transverse	0	Second compartment of SHIME apparatus.
-Skin swab	1	
-Small intestine	1	
-Soil bottom eggs	1	
-Spleen	1	
-Sputum	1	
-Sputum culture	1	
-Sterile swab	0	Swab taken out of packaging in sequencing lab immediately before extraction.
-Surface swab	0	
-Terminal ileum	1	
-Tongue swab	1	
-Tonsil	1	
-Tracheal aspirate	1	
-Tracheal control	1	
-Urethral swab	1	
-Urine	1	
-Vaginal Swab	1	
-Water	0	
-Weighing paper	0	
-Whole gut	1	From dissection.
+sample_type	rarity	host_associated	description
+Amnoitic fluid	Rare	1	NA
+BAL	Uncommon	1	NA
+Bedding	Uncommon	0	NA
+Biofilm	Rare	1	NA
+Bioreactor	Uncommon	0	NA
+Blank swab	Common	0	Swab taken out of packaging in sequencing lab immediately before extraction.
+Blood	Uncommon	1	NA
+Breast milk	Rare	1	NA
+Buffer	Uncommon	0	NA
+Cecum	Uncommon	1	NA
+Cell lysate	Uncommon	1	NA
+Cervical swab	Rare	1	NA
+Cheek swab	Uncommon	1	NA
+Crop	Rare	1	NA
+Dental plaque	Uncommon	1	NA
+Duodenum	Rare	1	NA
+Dust	Uncommon	0	NA
+Elution buffer	Common	0	NA
+Empty well	Common	0	NA
+Endometrial swab	Rare	1	NA
+Environmental control	Common	0	Includes Air swab, Environmental swab, Environmental blank
+Esophageal biopsy	Rare	1	NA
+Esophagus	Rare	1	NA
+Feces	Common	1	Human and animal fecal material.
+Feed	Uncommon	0	NA
+Fistula	Common	1	NA
+Fistula swab	Uncommon	1	NA
+Fly food	Rare	0	NA
+Fruit fly	Rare	1	NA
+Ileostomy fluid	Uncommon	1	NA
+Ileum	Uncommon	1	NA
+Kveim reagent	Uncommon	0	NA
+Lab water	Uncommon	0	NA
+Macular Retina	Rare	1	NA
+Meconium	Rare	1	NA
+Medium	Rare	0	NA
+Microbial culture	Common	0	NA
+Mock DNA	Common	0	NA
+Mouse chow	Rare	0	NA
+Nasal swab	Common	1	NA
+Nasopharyngeal swab	Uncommon	1	NA
+Oral swab	Common	1	NA
+Oral wash	Uncommon	1	NA
+Oropharyngeal swab	Uncommon	1	NA
+Ostomy fluid	Uncommon	1	NA
+Pancreatic fluid	Rare	1	NA
+PCR water	Uncommon	0	NA
+Peripheral retina	Rare	1	NA
+Placenta	Rare	1	NA
+Plasma	Uncommon	1	NA
+Rectal biopsy	Common	1	NA
+Rectal swab	Common	1	We have observed that results are sensitive to exact collection method employed, please include notes in publication.
+Saline	Uncommon	0	NA
+Saliva	Uncommon	1	NA
+Sediment	Uncommon	0	NA
+Serum	Uncommon	1	NA
+Skin swab	Common	1	NA
+Small intestine	Uncommon	1	NA
+Soil	Rare	1	NA
+Sputum	Common	1	NA
+Surface swab	Common	0	NA
+Tongue swab	Common	1	NA
+Tonsil	Rare	1	NA
+Tracheal aspirate	Common	1	NA
+Tracheal control	Uncommon	1	NA
+Urethral swab	Rare	1	NA
+Urine	Uncommon	1	NA
+Water	Uncommon	0	NA
+Weighing paper	Common	0	NA
+Whole gut	Uncommon	1	From dissection.
+Large intestine mucosa	Common	1	"NA"
+Large intestine lumen	Common	1	"NA"
