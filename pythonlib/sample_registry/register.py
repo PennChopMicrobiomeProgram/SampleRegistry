@@ -77,6 +77,9 @@ def register_sample_annotations(
         help=SAMPLE_TABLE_HELP)
     args = p.parse_args(argv)
 
+    if REGISTRY_DATABASE.query_run_exists(args.run_accession):
+        raise ValueError(f"Run with accession {args.run_accession} already exists.")
+
     sample_table = SampleTable.load(args.sample_table)
     sample_table.look_up_nextera_barcodes()
     sample_table.validate()
