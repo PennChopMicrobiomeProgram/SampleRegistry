@@ -1,0 +1,66 @@
+from sqlalchemy.orm import DeclarativeBase, mapped_column
+from typing import Mapped, Optional
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+class Run(Base):
+    __tablename__ = "runs"
+    run_accession: Mapped[int] = mapped_column(primary_key=True)
+    run_date: Mapped[str]
+    machine_type: Mapped[str]
+    machine_kit: Mapped[str]
+    lane: Mapped[int]
+    data_uri: Mapped[str]
+    comment: Mapped[str]
+    admin_comment: Mapped[Optional[str]] = mapped_column(nullable=True)
+
+    def __repr__(self):
+        return f"Run(run_accession={self.run_accession}, run_date={self.run_date}, machine_type={self.machine_type}, machine_kit={self.machine_kit}, lane={self.lane}, data_uri={self.data_uri}, comment={self.comment}, admin_comment={self.admin_comment})"
+    
+
+class Sample(Base):
+    __tablename__ = "samples"
+    sample_accession: Mapped[int] = mapped_column(primary_key=True)
+    sample_name: Mapped[str]
+    run_accession: Mapped[int] = mapped_column(foreign_key="runs.run_accession")
+    barcode_sequence: Mapped[str]
+    primer_sequence: Mapped[Optional[str]] = mapped_column(nullable=True)
+    sample_type: Mapped[Optional[str]] = mapped_column(nullable=True)
+    subject_id: Mapped[Optional[str]] = mapped_column(nullable=True)
+    host_species: Mapped[Optional[str]] = mapped_column(nullable=True)
+
+    def __repr__(self):
+        return f"Sample(sample_accession={self.sample_accession}, sample_name={self.sample_name}, run_accession={self.run_accession}, barcode_sequence={self.barcode_sequence}, primer_sequence={self.primer_sequence}, sample_type={self.sample_type}, subject_id={self.subject_id}, host_species={self.host_species})"
+    
+
+class Annotation(Base):
+    __tablename__ = "annotations"
+    sample_accession: Mapped[int] = mapped_column(foreign_key="samples.sample_accession")
+    key: Mapped[str]
+    val: Mapped[str]
+
+    def __repr__(self):
+        return f"Annotation(sample_accession={self.sample_accession}, key={self.key}, val={self.val})"
+
+
+class StandardSampleType(Base):
+    __tablename__ = "standard_sample_types"
+    sample_type: Mapped[str] = mapped_column(primary_key=True)
+    host_associated: Mapped[bool]
+    comment: Mapped[str]
+
+    def __repr__(self):
+        return f"StandardSampleType(sample_type={self.sample_type}, host_associated={self.host_associated}, comment={self.comment})"
+    
+
+class StandardHostSpecies(Base):
+    __tablename__ = "standard_host_species"
+    host_species: Mapped[str] = mapped_column(primary_key=True)
+    scientific_name: Mapped[str]
+    ncbi_taxon_id: Mapped[int]
+
+    def __repr__(self):
+        return f"StandardHostSpecies(host_species={self.host_species}, scientific_name={self.scientific_name}, ncbi_taxon_id={self.ncbi_taxon_id})"

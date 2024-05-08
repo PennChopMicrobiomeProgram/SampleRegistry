@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang = "en">
+
+<div class="container-fluid">
+  <head style="background-color:#f6f6f6">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="wid=device-width, intial-scale=1.0">
+  
+    <!-- Bootstrap -->
+    <link rel='stylesheet' href="{{ url_for('static', filename='css/bootstrap.min.css') }}" type='text/css'/> <!-- Loads css template for whole webpage -->
+    <meta name="viewport" content = "width=device-width, initial-scale=1.0">
+    <style type="text/css">
+      html,
+      body {
+        height:100%;
+        padding-top: 20px;
+      }
+    .table-responsive{
+      height:700px; 
+      overflow:scroll;
+    }
+    thead tr:nth-child(1) th{
+      position: sticky;
+      top: -1px;
+      z-index: 10;
+    }
+    </style>
+
+    <br>
+    <nav class = "navbar fixed-top bg-light">
+      <div class="row justify-content-start">
+        <div class="col-sm-auto">
+          <h2>
+            <a href="/" style="text-decoration: none">CHOP Microbiome Metadata Checker</a>
+          </h2>
+        </div>
+      </div>
+    </nav>    
+ 
+    {% block head %}{% endblock %}
+
+  </head>
+</div>
+
+<body>
+  
+  {% block body %}{% endblock %}
+
+  <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script> <!-- Loads js script for whole webpage -->
+  <script>
+    $(function () {
+      $('[data-toggle="popover"]')
+        .popover({
+          placement : 'top',
+          trigger : 'hover',
+        })
+    })
+  </script>
+</body>
+</html>
