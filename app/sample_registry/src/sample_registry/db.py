@@ -1,6 +1,78 @@
 import collections
+import csv
 import os.path
 import sqlite3
+import sys
+from datetime import datetime
+
+from . import SQLALCHEMY_DATABASE_URI, engine, session
+from .models import Base, Run, Sample, Annotation, StandardSampleType, StandardHostSpecies
+
+
+def create_test_db():
+    print(SQLALCHEMY_DATABASE_URI)
+    Base.metadata.create_all(engine)
+
+    run1 = Run(run_accession = 1, run_date=datetime.now(), machine_type="Illumina", machine_kit="MiSeq", lane=1, data_uri="s3://bucket1/run1", comment="Test run 1")
+    run2 = Run(run_accession = 2, run_date=datetime.now(), machine_type="Illumina", machine_kit="MiSeq", lane=1, data_uri="s3://bucket1/run2", comment="Test run 2")
+    session.bulk_save_objects([run1, run2])
+
+    sample1 = Sample(sample_accession = 1, sample_name="Sample1", run_accession=run1.run_accession, barcode_sequence="AAAA", primer_sequence="TTTT", sample_type="Stool", subject_id="Subject1", host_species="Human")
+    sample2 = Sample(sample_accession = 2, sample_name="Sample2", run_accession=run1.run_accession, barcode_sequence="CCCC", primer_sequence="GGGG", sample_type="Stool", subject_id="Subject2", host_species="Human")
+    sample3 = Sample(sample_accession = 3, sample_name="Sample3", run_accession=run2.run_accession, barcode_sequence="GGGG", primer_sequence="CCCC", sample_type="Stool", subject_id="Subject3", host_species="Human")
+    sample4 = Sample(sample_accession = 4, sample_name="Sample4", run_accession=run2.run_accession, barcode_sequence="TTTT", primer_sequence="AAAA", sample_type="Stool", subject_id="Subject4", host_species="Human")
+    session.bulk_save_objects([sample1, sample2, sample3, sample4])
+
+    session.add(Annotation(sample_accession=sample1.sample_accession, key="key1", val="val1"))
+    session.add(Annotation(sample_accession=sample1.sample_accession, key="key2", val="val2"))
+    session.add(Annotation(sample_accession=sample2.sample_accession, key="key1", val="val3"))
+    session.add(Annotation(sample_accession=sample2.sample_accession, key="key2", val="val4"))
+    session.add(Annotation(sample_accession=sample3.sample_accession, key="key1", val="val5"))
+    session.add(Annotation(sample_accession=sample3.sample_accession, key="key2", val="val6"))
+    session.add(Annotation(sample_accession=sample4.sample_accession, key="key1", val="val7"))
+    session.add(Annotation(sample_accession=sample4.sample_accession, key="key2", val="val8"))
+
+    try:
+        init_standard_sample_types()
+    except FileNotFoundError:
+        session.add(StandardSampleType(sample_type="Stool", rarity="Uncommon", host_associated=True, comment="Poo"))
+        session.add(StandardSampleType(sample_type="Blood", rarity="Common", host_associated=True, comment="Red stuff"))
+
+    try:
+        init_standard_host_species()
+    except FileNotFoundError:
+        session.add(StandardHostSpecies(host_species="Human", scientific_name="Person", ncbi_taxon_id=1))
+        session.add(StandardHostSpecies(host_species="Mouse", scientific_name="FurryLittleDude", ncbi_taxon_id=2))
+
+    session.commit()
+
+
+def init_standard_sample_types():
+    with open('standard_sample_types.tsv', 'r') as file:
+        reader = csv.reader(file, delimiter='\t')
+        next(reader)  # Skip header row
+        sample_types = []
+        for row in reader:
+            sample_type = row[0]
+            rarity = row[1]
+            host_associated = bool(row[2])
+            comment = row[3]
+            sample_types.append(StandardSampleType(sample_type=sample_type, rarity=rarity, host_associated=host_associated, comment=comment))
+        session.bulk_save_objects(sample_types)
+
+
+def init_standard_host_species():
+    with open('standard_host_species.tsv', 'r') as file:
+        reader = csv.reader(file, delimiter='\t')
+        next(reader)  # Skip header row
+        host_species_list = []
+        for row in reader:
+            host_species = row[0]
+            scientific_name = row[1]
+            ncbi_taxon_id = row[2]
+            host_species_list.append(StandardHostSpecies(host_species=host_species, scientific_name=scientific_name, ncbi_taxon_id=ncbi_taxon_id))
+        session.bulk_save_objects(host_species_list)
+
 
 
 class RegistryDatabase(object):
