@@ -42,3 +42,20 @@ def query_tag_stats(db: SQLAlchemy, tag: str):
             Annotation.val
         ).where(Annotation.key == tag
         ).all()
+    
+def cast_annotations(annotations, samples, default="NA"):
+    cols = {}
+    table = {}
+    for s in samples:
+        table[s.sample_accession] = {}
+
+    for a in annotations:
+        if a.key not in cols:
+            # Add new column to each row of table
+            for r in table.keys():
+                table[r][a.key] = default
+            # Add new column to future rows
+            cols[a.key] = default
+        table[a.sample_accession][a.key] = a.val
+
+    return list(cols.keys()), table

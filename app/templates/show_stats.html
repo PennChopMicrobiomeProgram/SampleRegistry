@@ -1,5 +1,43 @@
 {% extends 'base.html' %}
 
 {% block body %}
+<p>Every sample should have a SampleType: {{ num_samples_with_sampletype }} of {{ num_samples }} ({{ "%.2f"|format(100 * num_samples_with_sampletype / num_samples) }}%).</p>
 
+<p>All SampleType values should be in the approved list: {{ num_samples_with_standard_sampletype }} of {{ num_samples_with_sampletype }} ({{ "%.2f"|format(100 * num_samples_with_standard_sampletype / num_samples_with_sampletype) }}%).</p>
+
+Standard sample types:
+<table>
+<tr><th>SampleType</th><th>Count</th></tr>
+{% for s in standard_sampletype_counts %}
+<tr><td>{{ s.sample_type }}</td><td>{{ s[1] }}</td></tr>
+{% endfor %}
+</table>
+
+Nonstandard sample types:
+<table>
+<tr><th>SampleType</th><th>Count</th></tr>
+{% for s in nonstandard_sampletype_counts %}
+<tr><td>{{ s.sample_type }}</td><td>{{ s[1] }}</td></tr>
+{% endfor %}
+</table>
+
+<p>If SubjectID tag is filled in, HostSpecies tag should also be filled in: {{ num_subjectid_with_hostspecies }} of {{ num_subjectid }} ({{ "%.2f"|format(100 * num_subjectid_with_hostspecies / num_subjectid) }}%).</p>
+
+<p>All HostSpecies values should be in the approved list: {{ num_samples_with_standard_hostspecies }} of {{ num_samples_with_hostspecies }} ({{ "%.2f"|format(100 * num_samples_with_standard_hostspecies / num_samples_with_hostspecies) }}%).</p>
+
+Standard host species:
+<table>
+<tr><th>HostSpecies</th><th>Count</th></tr>
+{% for s in standard_hostspecies_counts %}
+<tr><td>{{ s.host_species }}</td><td>{{ s[1] }}</td></tr>
+{% endfor %}
+</table>
+
+Nonstandard host species:
+<table>
+<tr><th>HostSpecies</th><th>Count</th></tr>
+{% for s in nonstandard_hostspecies_counts %}
+<tr><td>{{ s.host_species }}</td><td>{{ s[1] }}</td></tr>
+{% endfor %}
+</table>
 {% endblock %}

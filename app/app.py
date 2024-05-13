@@ -2,6 +2,7 @@ import pickle
 import os
 from flask import (
     Flask,
+    Response,
     render_template,
     url_for,
     request,
@@ -12,9 +13,9 @@ from flask import (
 from flask_sqlalchemy import SQLAlchemy
 from pathlib import Path
 from sample_registry import SQLALCHEMY_DATABASE_URI
-from sample_registry.models import Base, Annotation, Run, Sample
+from sample_registry.models import Base, Annotation, Run, Sample, StandardHostSpecies, StandardSampleType
 from werkzeug.middleware.proxy_fix import ProxyFix
-from .db import query_tag_stats, STANDARD_TAGS
+from .db import cast_annotations, query_tag_stats, STANDARD_TAGS
 
 app = Flask(__name__)
 app.secret_key = os.urandom(12)
@@ -98,7 +99,56 @@ def show_runs(run_acc = None):
 
 @app.route("/stats")
 def show_stats():
-    return render_template("show_stats.html")
+    num_samples = db.session.query(Sample).count()
+    num_samples_with_sampletype = db.session.query(Sample).filter(Sample.sample_type != None).count()
+    num_samples_with_standard_sampletype = db.session.query(Sample).join(StandardSampleType, Sample.sample_type == StandardSampleType.sample_type).count()
+    standard_sampletype_counts = db.session.query(StandardSampleType.sample_type, db.func.count(Sample.sample_accession), StandardSampleType.host_associated).join(Sample, Sample.sample_type == StandardSampleType.sample_type).group_by(StandardSampleType.sample_type).order_by(db.func.count(Sample.sample_accession).desc()).all()
+    nonstandard_sampletype_counts = db.session.query(Sample.sample_type, db.func.count(Sample.sample_accession)).outerjoin(StandardSampleType, Sample.sample_type == StandardSampleType.sample_type).filter(StandardSampleType.sample_type == None).group_by(Sample.sample_type).order_by(db.func.count(Sample.sample_accession).desc()).all()
+
+    num_subjectid = db.session.query(Sample.subject_id).filter(Sample.subject_id != None).count()
+    num_subjectid_with_hostspecies = db.session.query(Sample.subject_id).filter(Sample.subject_id != None, Sample.host_species != None).count()
+
+    num_samples_with_hostspecies = db.session.query(Sample).filter(Sample.host_species != None).count()
+    num_samples_with_standard_hostspecies = db.session.query(Sample).join(StandardHostSpecies, Sample.host_species == StandardHostSpecies.host_species).count()
+    standard_hostspecies_counts = db.session.query(StandardHostSpecies.host_species, db.func.count(Sample.sample_accession), StandardHostSpecies.ncbi_taxon_id).join(Sample, Sample.host_species == StandardHostSpecies.host_species).group_by(StandardHostSpecies.host_species).order_by(db.func.count(Sample.sample_accession).desc()).all()
+    nonstandard_hostspecies_counts = db.session.query(Sample.host_species, db.func.count(Sample.sample_accession)).outerjoin(StandardHostSpecies, Sample.host_species == StandardHostSpecies.host_species).filter(StandardHostSpecies.host_species == None).group_by(Sample.host_species).order_by(db.func.count(Sample.sample_accession).desc()).all()
+
+    num_samples_with_primer = db.session.query(Sample).filter(Sample.primer_sequence != '').count()
+    num_samples_with_reverse_primer = db.session.query(Annotation).filter(Annotation.key == 'ReversePrimerSequence').distinct().count()
+    print(standard_sampletype_counts, nonstandard_sampletype_counts, standard_hostspecies_counts, nonstandard_hostspecies_counts)
+
+    return render_template("show_stats.html", num_samples=num_samples, num_samples_with_sampletype=num_samples_with_sampletype, num_samples_with_standard_sampletype=num_samples_with_standard_sampletype, standard_sampletype_counts=standard_sampletype_counts, nonstandard_sampletype_counts=nonstandard_sampletype_counts, num_subjectid=num_subjectid, num_subjectid_with_hostspecies=num_subjectid_with_hostspecies, num_samples_with_hostspecies=num_samples_with_hostspecies, num_samples_with_standard_hostspecies=num_samples_with_standard_hostspecies, standard_hostspecies_counts=standard_hostspecies_counts, nonstandard_hostspecies_counts=nonstandard_hostspecies_counts, num_samples_with_primer=num_samples_with_primer, num_samples_with_reverse_primer=num_samples_with_reverse_primer)
+
+
+@app.route("/export/<run_acc>")
+def export_run(run_acc):
+    if run_acc.endswith(".txt"):
+        run_acc = run_acc[:-4]
+        run = db.session.query(Run).filter(Run.run_accession == run_acc).first()
+        samples = db.session.query(Sample).filter(Sample.run_accession == run_acc).order_by(Sample.sample_name, Sample.sample_accession).all()
+        annotations = db.session.query(Annotation).filter(Annotation.sample_accession.in_([s.sample_accession for s in samples])).all()
+
+        # Change ReversePrimerSequence for compatibility with QIIME
+        for a in annotations:
+            if a.key == "ReversePrimerSequence":
+                a.key = "ReversePrimer"
+
+        cols, table = cast_annotations(annotations, samples)
+
+        print(run)
+        print(samples)
+
+        return render_template("export_qiime.txt", run=run, samples=samples, metadata=table, metadata_columns=cols)
+    elif run_acc.endswith(".tsv"):
+        run_acc = run_acc[:-4]
+        run = db.session.query(Run).filter(Run.run_accession == run_acc).first()
+        samples = db.session.query(Sample).filter(Sample.run_accession == run_acc).order_by(Sample.sample_name, Sample.sample_accession).all()
+        annotations = db.session.query(Annotation).filter(Annotation.sample_accession.in_([s.sample_accession for s in samples])).all()
+        cols, table = cast_annotations(annotations, samples)
+
+        return render_template("export_delim.txt", run=run, samples=samples, metadata=table, metadata_columns=cols)
+    else:
+        return render_template("failed_export.html", run_acc=run_acc)
 
 
 @app.route("/")

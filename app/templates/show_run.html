@@ -23,8 +23,8 @@
             </ul>
             <p>
             <strong>Export metadata for all samples:</strong><br />
-            <a href="{{ url_for('show_runs', run_acc=run.run_accession|string + '.txt') }}">QIIME-compatible mapping file</a><br/>
-            <a href="{{ url_for('show_runs', run_acc=run.run_accession|string + '.tsv') }}">Tab-delimited format (compatible with <code>read.delim</code> function in R)</a>
+            <a href="{{ url_for('export_run', run_acc=run.run_accession|string + '.txt') }}">QIIME-compatible mapping file</a><br/>
+            <a href="{{ url_for('export_run', run_acc=run.run_accession|string + '.tsv') }}">Tab-delimited format (compatible with <code>read.delim</code> function in R)</a>
             </p>
         </div>
 

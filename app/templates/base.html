@@ -31,18 +31,13 @@
 
     <br>
     <nav class = "navbar fixed-top bg-light" style="padding-bottom: 0px;">
-      <div class="row" style="display: flex; justify-content: center;">
+      <div class="row" style="display: flex; justify-content: space-between; align-items: center;">
           <h2>
             <a href="/" style="text-decoration: none">CHOP Microbiome Sample Registry</a>
           </h2>
-          <ul style="flex-direction: row; list-style-type: none;">
-            <li><a href="{{ url_for('show_runs') }}">Runs</a></li>
-            <li><a href="{{ url_for('show_tags') }}">Metadata</a></li>
-            <li><a href="{{ url_for('show_stats') }}">Stats</a></li>
-          </ul>
-          <div class="logoarea span-8 last" style="padding-left: 25px;">
-            <img class="sitelogo" src="{{ url_for('static', filename='img/ricks_dna.png') }}" />
-          </div>
+          <a style="padding-left: 10px" href="{{ url_for('show_runs') }}">Runs</a>
+          <a style="padding-left: 10px" href="{{ url_for('show_tags') }}">Metadata</a>
+          <a style="padding-left: 10px" href="{{ url_for('show_stats') }}">Stats</a>
       </div>
     </nav>
  
