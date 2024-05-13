@@ -8,6 +8,9 @@
   
     <!-- Bootstrap -->
     <link rel='stylesheet' href="{{ url_for('static', filename='css/bootstrap.min.css') }}" type='text/css'/> <!-- Loads css template for whole webpage -->
+    <link href="https://cdn.datatables.net/v/dt/dt-2.0.7/datatables.min.css" rel="stylesheet">
+
+
     <meta name="viewport" content = "width=device-width, initial-scale=1.0">
     <style type="text/css">
       html,
@@ -27,15 +30,21 @@
     </style>
 
     <br>
-    <nav class = "navbar fixed-top bg-light">
-      <div class="row justify-content-start">
-        <div class="col-sm-auto">
+    <nav class = "navbar fixed-top bg-light" style="padding-bottom: 0px;">
+      <div class="row" style="display: flex; justify-content: center;">
           <h2>
-            <a href="/" style="text-decoration: none">CHOP Microbiome Metadata Checker</a>
+            <a href="/" style="text-decoration: none">CHOP Microbiome Sample Registry</a>
           </h2>
-        </div>
+          <ul style="flex-direction: row; list-style-type: none;">
+            <li><a href="{{ url_for('show_runs') }}">Runs</a></li>
+            <li><a href="{{ url_for('show_tags') }}">Metadata</a></li>
+            <li><a href="{{ url_for('show_stats') }}">Stats</a></li>
+          </ul>
+          <div class="logoarea span-8 last" style="padding-left: 25px;">
+            <img class="sitelogo" src="{{ url_for('static', filename='img/ricks_dna.png') }}" />
+          </div>
       </div>
-    </nav>    
+    </nav>
  
     {% block head %}{% endblock %}
 
@@ -43,11 +52,9 @@
 </div>
 
 <body>
-  
-  {% block body %}{% endblock %}
-
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script> <!-- Loads js script for whole webpage -->
+  <script src="https://cdn.datatables.net/v/dt/dt-2.0.7/datatables.min.js"></script>
   <script>
     $(function () {
       $('[data-toggle="popover"]')
@@ -57,5 +64,7 @@
         })
     })
   </script>
+
+  {% block body %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<form id="samplesForm">
+    <div id="samples_summary" class="summary span-24 last">
+      <h2><strong>Samples tagged with {{ tag }} = {{ val }}</strong></h2>
+    </div>
+    
+    <table id="samples" class="display">
+      <thead>
+        <tr>
+          <th>Sample name</th>
+          <th>Primer</th>
+          <th>Run date</th>
+          <th>Run accession</th>
+          <th>Annotations (<a class="showAll" href="#">show all</a>, <a class="hideAll" href="#">hide all</a>)</th>
+        </tr>
+      </thead>
+      <tbody>
+    {% for sample in samples %}
+        <tr>
+          <td>{{ sample.sample_name }}</td>
+                              <td>{{ sample.primer_sequence|upper }}</td>
+          <td><span class="date">{{ "/".join(sample.run_date.split("-")) }}</span></td>
+          <td><a href="{{ url_for('show_runs', run_acc = sample.run_accession) }}">{{ "CMR{:06d}".format(sample.run_accession) }}</a></td>
+          <td><div class="metadata toggle">
+            <ul>
+              <li><strong>sample_accession</strong>:{{ "CMS{:06d}".format(sample.sample_accession) }}</li>
+    {% if sample.sample_accession in sample_metadata %}
+        {% for a in sample_metadata[sample.sample_accession] %}
+            <li><strong>{{ a.key }}</strong>:{{ a.val }}</li>
+        {% endfor %}
+    {% endif %}
+            </ul>
+          </div></td>
+        </tr>
+    {% endfor %}
+      </tbody>
+    </table>
+</form>
+    
+<script type="text/javascript">
+$(document).ready(function () {
+    /* Set up data table */
+    $('#samples').dataTable({
+    "bSort": false,
+        "bPaginate": false,
+    });
+
+    /* Move search box to bottom of summary area */
+    $("#samples_filter").appendTo('#samples_summary');
+
+    /* Toggle detailed sample metadata */
+    $('.toggle').each(function() {
+        var nItems = $(this).find('li').length;
+        if (nItems > 0) {
+        var toggleText = nItems + ' annotations';
+        $(this).parent().prepend('<a href="#" class="toggleLink">' + toggleText + '</a>');
+    } else {
+        $(this).parent().prepend('None');
+    }
+        $(this).hide();
+    });
+
+    $('a.toggleLink').click(function() {
+        $(this).next().toggle();
+        return false; // do not follow link
+    });
+
+    $('a.showAll').click(function() {
+    $('.toggle').show();
+        return false;
+    });
+
+    $('a.hideAll').click(function() {
+    $('.toggle').hide();
+        return false;
+    });
+});
+</script>
+{% endblock %}

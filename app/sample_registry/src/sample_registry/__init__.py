@@ -15,7 +15,7 @@ except KeyError:
     # For development purposes, use a SQLite db prefilled with some demo data
     sys.stderr.write("Missing database connection information in environment, using test SQLite database\n")
     sys.stderr.write(f"DB_HOST: {os.environ.get('DB_HOST')}\nDB_USER: {os.environ.get('DB_USER')}\nDB_NAME: {os.environ.get('DB_NAME')}\nDB_PSWD: {os.environ.get('DB_PSWD')}\n")
-    SQLALCHEMY_DATABASE_URI = "sqlite:///sample_registry.sqlite3"
+    SQLALCHEMY_DATABASE_URI = "sqlite:////home/ctbus/Penn/SampleRegistry/sample_registry.sqlite3"
 
 # Create database engine
 engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=False)

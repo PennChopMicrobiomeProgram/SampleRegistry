@@ -1,0 +1,156 @@
+.date {
+    white-space: nowrap;
+}
+
+h1 { 
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    font-size: 33px;
+    margin-top: 25px;
+    margin-bottom: 0px;
+}
+
+h1 a { 
+    text-decoration: none;
+    color: #000;
+}
+
+.header ul {
+    display: inline;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.header li { 
+    display: inline;
+    margin: 0;
+    font-size: 18px;
+    padding: 0px 30px 10px 0px;
+}
+.header a { 
+    text-decoration: none;
+ }
+
+.summary {
+    background: #ddd;
+}
+.summary h2, .summary h3, .summary p { 
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.summary ul {
+    padding: 0;
+    margin-left: 20px;
+    text-indent: -10px;
+    list-style: none;
+}
+.summary h2, .summary h3 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#ajaxResponse { 
+    color: #009900;
+}
+
+.metadata ul {
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+}
+.metadata ul > li {
+    margin-left: 15px;
+    text-indent: -15px;
+}
+
+.standardtags { 
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.tagcloud a {
+    padding: 10px 10px 10px 0;
+}
+
+.tag-values {
+    padding: 10px;
+}
+.tag-values h4 {
+    margin-bottom: 0;
+}
+.tag-values ol {
+    list-style: none;
+}
+
+.alert { 
+    color: "red";
+}
+
+#ticket {
+    width: 200px;
+}
+
+/* Derived from demo_table.css in the DataTables distribution */
+
+table.display {
+    clear: both;
+    border-bottom: 1px solid black;
+    margin-bottom: 10px;
+}
+
+table.display thead th {
+    font-weight: bold;
+    border-bottom: 1px solid black;
+    padding: 3px 20px 3px 10px;
+}
+
+table.display td {
+    padding: 4px 10px;
+    vertical-align: top;
+}
+
+.dataTables_filter {
+    text-align: right;
+    margin-right: 10px;
+}
+
+.dataTables_filter input {
+    width: 290px;
+}
+
+.dataTables_info {
+    height: 22px;
+    line-height: 22px;
+}
+
+.dataTables_paginate {
+    text-align: right;
+}
+
+.paging_full_numbers {
+    height: 22px;
+    line-height: 22px;
+}
+
+.paging_full_numbers span.paginate_button,
+     .paging_full_numbers span.paginate_active {
+    border: 1px solid #aaa;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    padding: 2px 5px;
+    margin: 0 3px;
+    cursor: pointer;
+    * cursor: hand;
+}
+
+.paging_full_numbers span.paginate_button {
+	background-color: #ddd;
+}
+
+.paging_full_numbers span.paginate_button:hover {
+	background-color: #ccc;
+}
+
+.paging_full_numbers span.paginate_active {
+	background-color: #99B3FF;
+}

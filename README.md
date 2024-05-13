@@ -2,7 +2,7 @@
 
 ## Development
 
-To start with development:
+To start with local development:
 
 ```
 git clone https://github.com/PennChopMicrobiomeProgram/SampleRegistry.git
@@ -13,5 +13,6 @@ pip install -r requirements.txt
 pip install app/sample_registry
 
 create_test_db
-
+export FLASK_DEBUG=1 && flask --app app/app run
 ```
+

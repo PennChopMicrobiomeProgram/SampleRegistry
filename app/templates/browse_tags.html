@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+    <h2>Sample annotations</h2>
+    
+    <p>Click on a sample annotation to see a table of annotation values, broken 
+    down by sequencing run.</p>
+    
+    <h3>Standard annotations</h3>
+    <p class="standardtags">
+        <a href="{{ url_for('show_tags', tag='SampleType') }}">SampleType</a>
+        <a href="{{ url_for('show_tags', tag='HostSpecies') }}">HostSpecies</a>
+        <a href="{{ url_for('show_tags', tag='SubjectID') }}">SubjectID</a>
+    </p>
+    
+    <h3>Other sample annotations</h3>
+    
+    <p class="tagcloud">
+        {% for tag in tags %}
+        <a href="{{ url_for('show_tags', tag=tag[0]) }}" style="font-size: {{ 10 + 90 * (tag[1] / maxcnt) }}px">{{ tag[0] }}</a> 
+        {% endfor %}
+    </p>
+{% endblock %}

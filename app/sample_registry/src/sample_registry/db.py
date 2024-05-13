@@ -2,7 +2,6 @@ import collections
 import csv
 import os.path
 import sqlite3
-import sys
 from datetime import datetime
 
 from . import SQLALCHEMY_DATABASE_URI, engine, session
@@ -13,8 +12,8 @@ def create_test_db():
     print(SQLALCHEMY_DATABASE_URI)
     Base.metadata.create_all(engine)
 
-    run1 = Run(run_accession = 1, run_date=datetime.now(), machine_type="Illumina", machine_kit="MiSeq", lane=1, data_uri="s3://bucket1/run1", comment="Test run 1")
-    run2 = Run(run_accession = 2, run_date=datetime.now(), machine_type="Illumina", machine_kit="MiSeq", lane=1, data_uri="s3://bucket1/run2", comment="Test run 2")
+    run1 = Run(run_accession = 1, run_date=datetime.now(), machine_type="Illumina", machine_kit="MiSeq", lane=1, data_uri="run1", comment="Test run 1")
+    run2 = Run(run_accession = 2, run_date=datetime.now(), machine_type="Illumina", machine_kit="MiSeq", lane=1, data_uri="run2", comment="Test run 2")
     session.bulk_save_objects([run1, run2])
 
     sample1 = Sample(sample_accession = 1, sample_name="Sample1", run_accession=run1.run_accession, barcode_sequence="AAAA", primer_sequence="TTTT", sample_type="Stool", subject_id="Subject1", host_species="Human")
@@ -72,7 +71,6 @@ def init_standard_host_species():
             ncbi_taxon_id = row[2]
             host_species_list.append(StandardHostSpecies(host_species=host_species, scientific_name=scientific_name, ncbi_taxon_id=ncbi_taxon_id))
         session.bulk_save_objects(host_species_list)
-
 
 
 class RegistryDatabase(object):
