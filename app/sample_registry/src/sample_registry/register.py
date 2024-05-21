@@ -41,15 +41,15 @@ as comments.
 
 def unregister_samples(argv=None, db=REGISTRY_DATABASE, out=sys.stdout):
     p = argparse.ArgumentParser(
-        description="Remove samples for a sequencing run from the registry.")
+        description="Remove samples for a sequencing run from the registry."
+    )
     p.add_argument("run_accession", type=int, help="Run accession number")
     args = p.parse_args(argv)
 
     registry = SampleRegistry(db)
     registry.check_run_accession(args.run_accession)
     samples_removed = registry.remove_samples(args.run_accession)
-    out.write("Removed {0} samples: {1}".format(
-        len(samples_removed), samples_removed))
+    out.write("Removed {0} samples: {1}".format(len(samples_removed), samples_removed))
 
 
 def register_samples():
@@ -61,20 +61,17 @@ def register_annotations():
 
 
 def register_sample_annotations(
-        argv=None, register_samples=False, db=REGISTRY_DATABASE,
-        out=sys.stdout):
+    argv=None, register_samples=False, db=REGISTRY_DATABASE, out=sys.stdout
+):
 
     if register_samples:
         p = argparse.ArgumentParser(description=SAMPLES_DESC)
     else:
         p = argparse.ArgumentParser(
-            description=ANNOTATIONS_DESC, epilog=ANNOTATIONS_EPILOG)
-    p.add_argument(
-        "run_accession", type=int,
-        help="Run accession number")
-    p.add_argument(
-        "sample_table", type=argparse.FileType('r'),
-        help=SAMPLE_TABLE_HELP)
+            description=ANNOTATIONS_DESC, epilog=ANNOTATIONS_EPILOG
+        )
+    p.add_argument("run_accession", type=int, help="Run accession number")
+    p.add_argument("sample_table", type=argparse.FileType("r"), help=SAMPLE_TABLE_HELP)
     args = p.parse_args(argv)
 
     sample_table = SampleTable.load(args.sample_table)
@@ -87,8 +84,9 @@ def register_sample_annotations(
         registry.register_samples(args.run_accession, sample_table)
     registry.register_annotations(args.run_accession, sample_table)
 
+
 def parse_tsv_ncol(f, ncol):
-    assert(ncol > 0)
+    assert ncol > 0
     # Skip header
     next(f)
     for line in f:
@@ -99,15 +97,14 @@ def parse_tsv_ncol(f, ncol):
             continue
         vals = line.split("\t")
         if len(vals) < ncol:
-            raise ValueError(
-                "Each line must contain at least {0} fields".format(ncol))
+            raise ValueError("Each line must contain at least {0} fields".format(ncol))
         yield tuple(vals[:ncol])
 
 
-def register_sample_types(
-        argv=None, db=REGISTRY_DATABASE, out=sys.stdout):
-    p = argparse.ArgumentParser(description=(
-        "Update the list of standard sample types in the registry"))
+def register_sample_types(argv=None, db=REGISTRY_DATABASE, out=sys.stdout):
+    p = argparse.ArgumentParser(
+        description=("Update the list of standard sample types in the registry")
+    )
     p.add_argument("file", type=argparse.FileType("r"))
     args = p.parse_args(argv)
 
@@ -116,10 +113,10 @@ def register_sample_types(
     db.register_standard_sample_types(sample_types)
 
 
-def register_host_species(
-        argv=None, db=REGISTRY_DATABASE, out=sys.stdout):
-    p = argparse.ArgumentParser(description=(
-        "Update the list of standard host species in the registry"))
+def register_host_species(argv=None, db=REGISTRY_DATABASE, out=sys.stdout):
+    p = argparse.ArgumentParser(
+        description=("Update the list of standard host species in the registry")
+    )
     p.add_argument("file", type=argparse.FileType("r"))
     args = p.parse_args(argv)
 
@@ -129,33 +126,38 @@ def register_host_species(
 
 
 def register_illumina_file(argv=None, db=REGISTRY_DATABASE, out=sys.stdout):
-    p = argparse.ArgumentParser(description=(
-        "Add a new run to the registry from a gzipped Illumina FASTQ file"))
+    p = argparse.ArgumentParser(
+        description=("Add a new run to the registry from a gzipped Illumina FASTQ file")
+    )
     p.add_argument("file")
     p.add_argument("comment", help="Comment (free text)")
     args = p.parse_args(argv)
 
     f = IlluminaFastq(gzip.open(args.file, "rt"))
     acc = db.register_run(
-        f.date, f.machine_type, "Nextera XT", f.lane, f.filepath, args.comment)
+        f.date, f.machine_type, "Nextera XT", f.lane, f.filepath, args.comment
+    )
     out.write("Registered run {0} in the database\n".format(acc))
 
 
 def register_run(argv=None, db=REGISTRY_DATABASE, out=sys.stdout):
-    p = argparse.ArgumentParser(
-        description="Add a new run to the registry")
+    p = argparse.ArgumentParser(description="Add a new run to the registry")
     p.add_argument("file", help="Resource filepath (not checked)")
     p.add_argument("--date", required=True, help="Run date (YYYY-MM-DD)")
     p.add_argument("--comment", required=True, help="Comment (free text)")
     p.add_argument(
-        "--type", default="Illumina-MiSeq", choices=SampleRegistry.machines,
-        help="Machine type")
+        "--type",
+        default="Illumina-MiSeq",
+        choices=SampleRegistry.machines,
+        help="Machine type",
+    )
     p.add_argument("--lane", default="1", help="Lane number")
     args = p.parse_args(argv)
 
     acc = db.register_run(
-        args.date, args.type, "Nextera XT", args.lane, args.file, args.comment)
-    out.write(u"Registered run %s in the database\n" % acc)
+        args.date, args.type, "Nextera XT", args.lane, args.file, args.comment
+    )
+    out.write("Registered run %s in the database\n" % acc)
 
 
 class SampleRegistry(object):
@@ -165,9 +167,7 @@ class SampleRegistry(object):
         "Illumina-NovaSeq",
         "Illumina-MiniSeq",
     ]
-    kits = [
-        "Nextera XT"
-    ]
+    kits = ["Nextera XT"]
 
     def __init__(self, registry_db):
         self.db = registry_db

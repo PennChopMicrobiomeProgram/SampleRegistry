@@ -3,9 +3,15 @@ import io
 import unittest
 
 from sample_registry.util import (
-    key_by_attr, dict_from_eav, local_filepath,
-    parse_fasta, parse_fastq, deambiguate, reverse_complement,
-    )
+    key_by_attr,
+    dict_from_eav,
+    local_filepath,
+    parse_fasta,
+    parse_fastq,
+    deambiguate,
+    reverse_complement,
+)
+
 
 class UtilTests(unittest.TestCase):
     def test_key_by_attr(self):
@@ -14,7 +20,7 @@ class UtilTests(unittest.TestCase):
         a2 = A(b="4", c="5", d="6")
         a3 = A(b="1", c="8", d="9")
         xs = [a1, a2, a3]
-        
+
         bs = key_by_attr(xs, "b")
         self.assertEqual(set(bs["1"]), set([a1, a3]))
 
@@ -23,25 +29,23 @@ class UtilTests(unittest.TestCase):
             ("a", "attr1", "bldj"),
             ("b", "attr1", "meh"),
             ("c", "attr1", "hey"),
-            ("a", "mdk", "www")]
+            ("a", "mdk", "www"),
+        ]
         self.assertEqual(dict_from_eav(xs, "a"), dict(attr1="bldj", mdk="www"))
 
     def test_local_filepath(self):
         # Normal filepath if no mountpoints given
-        self.assertEqual(
-            local_filepath("abc", None, None), "abc")
+        self.assertEqual(local_filepath("abc", None, None), "abc")
         # Absolute filepaths are ok
-        self.assertEqual(
-            local_filepath("/abc", None, None), "/abc")
+        self.assertEqual(local_filepath("/abc", None, None), "/abc")
         # Allow for local mount point
-        self.assertEqual(
-            local_filepath("/abc", "/mnt/files", None), "/mnt/files/abc")
+        self.assertEqual(local_filepath("/abc", "/mnt/files", None), "/mnt/files/abc")
         # Allow for non-root folder of remote host to be mounted locally
         self.assertEqual(
-            local_filepath("/abc/def", "/mnt/files", "/abc"), "/mnt/files/def")
+            local_filepath("/abc/def", "/mnt/files", "/abc"), "/mnt/files/def"
+        )
         # Remote mount point not used if no local mount point is given
-        self.assertEqual(
-            local_filepath("/abc/def", None, "/jhsdf"), "/abc/def")
+        self.assertEqual(local_filepath("/abc/def", None, "/jhsdf"), "/abc/def")
 
     def test_parse_fasta(self):
         obs = parse_fasta(io.StringIO(fasta1))
@@ -52,10 +56,12 @@ class UtilTests(unittest.TestCase):
 
     def test_parse_fastq(self):
         obs = parse_fastq(io.StringIO(fastq1))
-        self.assertEqual(next(obs), (
-            "YesYes", "AGGGCCTTGGTGGTTAG", ";234690GSDF092384"))
-        self.assertEqual(next(obs), (
-            "Seq2:with spaces", "GCTNNNNNNNNNNNNNNN", "##################"))
+        self.assertEqual(
+            next(obs), ("YesYes", "AGGGCCTTGGTGGTTAG", ";234690GSDF092384")
+        )
+        self.assertEqual(
+            next(obs), ("Seq2:with spaces", "GCTNNNNNNNNNNNNNNN", "##################")
+        )
         self.assertRaises(StopIteration, next, obs)
 
     def test_deambiguate(self):
@@ -72,7 +78,7 @@ class UtilTests(unittest.TestCase):
         self.assertRaises(KeyError, reverse_complement, "ANCC")
 
 
-fasta1 = u"""\
+fasta1 = """\
 >seq1 hello
 ACGTGG
 GTTAA
@@ -83,7 +89,7 @@ GAAA
 >seq3
 """
 
-fastq1 = u"""\
+fastq1 = """\
 @YesYes
 AGGGCCTTGGTGGTTAG
 +
@@ -94,5 +100,5 @@ GCTNNNNNNNNNNNNNNN
 ##################
 """
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

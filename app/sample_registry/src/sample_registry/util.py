@@ -91,7 +91,7 @@ AMBIGUOUS_BASES = {
     "V": "CAG",
     "D": "TAG",
     "N": "TCAG",
-    }
+}
 
 # Ambiguous base codes for all bases EXCEPT the key
 AMBIGUOUS_BASES_COMPLEMENT = {
@@ -99,21 +99,23 @@ AMBIGUOUS_BASES_COMPLEMENT = {
     "C": "D",
     "A": "B",
     "G": "H",
-    }
+}
 
 
 def deambiguate(seq):
     nt_choices = [AMBIGUOUS_BASES[x] for x in seq]
     return ["".join(c) for c in itertools.product(*nt_choices)]
 
+
 COMPLEMENT_BASES = {
     "T": "A",
     "C": "G",
     "A": "T",
     "G": "C",
-    }
+}
+
 
 def reverse_complement(seq):
     rc = [COMPLEMENT_BASES[x] for x in seq]
     rc.reverse()
-    return ''.join(rc)
+    return "".join(rc)

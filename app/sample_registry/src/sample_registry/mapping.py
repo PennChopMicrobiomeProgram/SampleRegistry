@@ -9,9 +9,18 @@ class SampleTable(object):
     # samples.
     CORE_FIELDS = ["SampleID", "BarcodeSequence"]
 
-    NAs = set([
-        "", "0000-00-00", "null", "Null", "NA", "na", "none", "None",
-    ])
+    NAs = set(
+        [
+            "",
+            "0000-00-00",
+            "null",
+            "Null",
+            "NA",
+            "na",
+            "none",
+            "None",
+        ]
+    )
 
     def __init__(self, recs):
         self.recs = recs
@@ -40,8 +49,8 @@ class SampleTable(object):
     def write(self, f):
         rows = _cast(self.recs, self.CORE_FIELDS, [])
         for row in rows:
-            f.write(u"\t".join(row))
-            f.write(u"\n")
+            f.write("\t".join(row))
+            f.write("\n")
 
     @classmethod
     def load(cls, f):
@@ -49,7 +58,8 @@ class SampleTable(object):
         if not recs:
             raise ValueError(
                 "No records found in sample info file. "
-                "Problem with windows line endings?")
+                "Problem with windows line endings?"
+            )
         return cls(recs)
 
     @classmethod
@@ -57,7 +67,7 @@ class SampleTable(object):
         """Parse mapping file, return each record as a dict."""
         header = next(f).lstrip("#")
         keys = cls._tokenize(header)
-        assert(all(keys)) # No blank fields in header
+        assert all(keys)  # No blank fields in header
         for line in f:
             if line.startswith("#"):
                 continue
@@ -140,7 +150,7 @@ def _validate_barcodes(recs):
             raise ValueError("Illegal characters in barcode: %s" % r)
 
 
-NEXTERA_BARCODES = u"""\
+NEXTERA_BARCODES = """\
 N701	TAAGGCGA
 N702	CGTACTAG
 N703	AGGCAGAA

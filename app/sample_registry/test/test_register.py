@@ -8,8 +8,10 @@ import unittest
 from sample_registry.db import RegistryDatabase
 from sample_registry.mapping import SampleTable
 from sample_registry.register import (
-    register_run, register_sample_annotations,
-    unregister_samples, register_illumina_file,
+    register_run,
+    register_sample_annotations,
+    unregister_samples,
+    register_illumina_file,
     register_sample_types,
     register_host_species,
 )
@@ -29,27 +31,30 @@ class RegisterScriptTests(unittest.TestCase):
         self.db.create_tables()
         self.run_args = [
             "abc",
-            "--lane", "1",
-            "--date", "2008-09-21",
-            "--type", "Illumina-MiSeq",
-            "--comment", "mdsnfa adsf",
+            "--lane",
+            "1",
+            "--date",
+            "2008-09-21",
+            "--type",
+            "Illumina-MiSeq",
+            "--comment",
+            "mdsnfa adsf",
         ]
-        self.samples = [{
-            "SampleID": "abc123",
-            "BarcodeSequence": "GGGCCT",
-            "SampleType": "Oral swab",
-            "bb": "cd e29",
-        }]
+        self.samples = [
+            {
+                "SampleID": "abc123",
+                "BarcodeSequence": "GGGCCT",
+                "SampleType": "Oral swab",
+                "bb": "cd e29",
+            }
+        ]
 
     def test_register_run(self):
         out = io.StringIO()
         register_run(self.run_args, self.db, out)
 
         # Check that accession number is printed
-        self.assertEqual(
-            out.getvalue(),
-            "Registered run 1 in the database\n"
-        )
+        self.assertEqual(out.getvalue(), "Registered run 1 in the database\n")
 
         # Check that attributes are saved in the database
         self.assertEqual(self.db.query_run_file(1), "abc")
@@ -57,8 +62,8 @@ class RegisterScriptTests(unittest.TestCase):
     def test_register_illumina_file(self):
         tmp_dir = tempfile.mkdtemp()
         fastq_dir = (
-            "Miseq/160511_M03543_0047_000000000-APE6Y/Data/Intensities/"
-            "BaseCalls")
+            "Miseq/160511_M03543_0047_000000000-APE6Y/Data/Intensities/" "BaseCalls"
+        )
         fastq_name = "Undetermined_S0_L001_R1_001.fastq.gz"
 
         os.makedirs(os.path.join(tmp_dir, fastq_dir))
@@ -72,8 +77,7 @@ class RegisterScriptTests(unittest.TestCase):
         original_cwd = os.getcwd()
         os.chdir(tmp_dir)
         try:
-            register_illumina_file(
-                [relative_fp, "abcd efg"], self.db, out)
+            register_illumina_file([relative_fp, "abcd efg"], self.db, out)
         finally:
             os.chdir(original_cwd)
             shutil.rmtree(tmp_dir)
@@ -89,18 +93,20 @@ class RegisterScriptTests(unittest.TestCase):
 
         # Check that accession number is assigned
         obs_accessions = self.db.query_barcoded_sample_accessions(
-            1, [("abc123", "GGGCCT")])
+            1, [("abc123", "GGGCCT")]
+        )
         self.assertEqual(obs_accessions, [1])
 
         # Check that annotations are saved to the database
         self.assertEqual(
             self.db.query_sample_annotations(1),
-            {"SampleType": "Oral swab", "bb": "cd e29"})
+            {"SampleType": "Oral swab", "bb": "cd e29"},
+        )
 
     def test_register_annotations(self):
         register_run(self.run_args, self.db)
         sample_file = temp_sample_file(self.samples)
-        args = [ "1", sample_file.name]
+        args = ["1", sample_file.name]
         register_sample_annotations(args, True, self.db)
 
         # Update SampleType, add fg
@@ -113,8 +119,7 @@ class RegisterScriptTests(unittest.TestCase):
         args = ["1", sample_file.name]
         register_sample_annotations(args, False, self.db)
 
-        self.assertEqual(
-            self.db.query_sample_annotations(1), new_annotations)
+        self.assertEqual(self.db.query_sample_annotations(1), new_annotations)
 
     def test_unregister_samples(self):
         register_run(self.run_args, self.db)
@@ -133,9 +138,7 @@ class RegisterScriptTests(unittest.TestCase):
         f.seek(0)
 
         register_sample_types([f.name], self.db)
-        self.assertEqual(
-            self.db.query_standard_sample_types(),
-            SAMPLE_TYPES_VALS)
+        self.assertEqual(self.db.query_standard_sample_types(), SAMPLE_TYPES_VALS)
 
         # Add a new sample type and re-register
         new_line = "Extra type	1	Just to test"
@@ -146,7 +149,8 @@ class RegisterScriptTests(unittest.TestCase):
         register_sample_types([f2.name], self.db)
         self.assertEqual(
             self.db.query_standard_sample_types(),
-            SAMPLE_TYPES_VALS + [("Extra type", 1, "Just to test")])
+            SAMPLE_TYPES_VALS + [("Extra type", 1, "Just to test")],
+        )
 
     def test_register_host_species(self):
         f = tempfile.NamedTemporaryFile("wt")
@@ -154,9 +158,7 @@ class RegisterScriptTests(unittest.TestCase):
         f.seek(0)
 
         register_host_species([f.name], self.db)
-        self.assertEqual(
-            self.db.query_standard_host_species(),
-            HOST_SPECIES_VALS)
+        self.assertEqual(self.db.query_standard_host_species(), HOST_SPECIES_VALS)
 
         # Add a new species to the file and re-register
         new_line = "Hippo	Test	1243"
@@ -167,7 +169,8 @@ class RegisterScriptTests(unittest.TestCase):
         register_host_species([f2.name], self.db)
         self.assertEqual(
             self.db.query_standard_host_species(),
-            HOST_SPECIES_VALS + [("Hippo", "Test", 1243)])
+            HOST_SPECIES_VALS + [("Hippo", "Test", 1243)],
+        )
 
 
 SAMPLE_TYPES_TSV = """\

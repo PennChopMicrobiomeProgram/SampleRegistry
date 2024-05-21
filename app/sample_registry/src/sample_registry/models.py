@@ -20,7 +20,7 @@ class Run(Base):
 
     def __repr__(self):
         return f"Run(run_accession={self.run_accession}, run_date={self.run_date}, machine_type={self.machine_type}, machine_kit={self.machine_kit}, lane={self.lane}, data_uri={self.data_uri}, comment={self.comment}, admin_comment={self.admin_comment})"
-    
+
 
 class Sample(Base):
     __tablename__ = "samples"
@@ -35,11 +35,13 @@ class Sample(Base):
 
     def __repr__(self):
         return f"Sample(sample_accession={self.sample_accession}, sample_name={self.sample_name}, run_accession={self.run_accession}, barcode_sequence={self.barcode_sequence}, primer_sequence={self.primer_sequence}, sample_type={self.sample_type}, subject_id={self.subject_id}, host_species={self.host_species})"
-    
+
 
 class Annotation(Base):
     __tablename__ = "annotations"
-    sample_accession: Mapped[int] = mapped_column(ForeignKey("samples.sample_accession"), primary_key=True)
+    sample_accession: Mapped[int] = mapped_column(
+        ForeignKey("samples.sample_accession"), primary_key=True
+    )
     key: Mapped[str] = mapped_column(primary_key=True)
     val: Mapped[str]
 
@@ -56,7 +58,7 @@ class StandardSampleType(Base):
 
     def __repr__(self):
         return f"StandardSampleType(sample_type={self.sample_type}, rarity={self.rarity}, host_associated={self.host_associated}, comment={self.comment})"
-    
+
 
 class StandardHostSpecies(Base):
     __tablename__ = "standard_host_species"

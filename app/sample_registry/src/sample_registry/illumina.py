@@ -4,7 +4,12 @@ import re
 
 
 class IlluminaFastq(object):
-    machine_types = {"D": "Illumina-HiSeq", "M": "Illumina-MiSeq", "A": "Illumina-NovaSeq", "N": "Illumina-MiniSeq"}
+    machine_types = {
+        "D": "Illumina-HiSeq",
+        "M": "Illumina-MiSeq",
+        "A": "Illumina-NovaSeq",
+        "N": "Illumina-MiniSeq",
+    }
 
     def __init__(self, f):
         self.file = f
@@ -37,8 +42,7 @@ class IlluminaFastq(object):
         dirs = splitall(self.file.name)
         rundir = dirs[1]
         if not re.match("\\d{6}_", rundir):
-            raise ValueError(
-                "Could not find date in folder name: {0}".format(rundir))
+            raise ValueError("Could not find date in folder name: {0}".format(rundir))
         year = rundir[0:2]
         month = rundir[2:4]
         day = rundir[4:6]
@@ -61,7 +65,7 @@ def splitall(path):
         if left == path:  # sentinel for absolute paths
             allparts.insert(0, left)
             break
-        elif right == path: # sentinel for relative paths
+        elif right == path:  # sentinel for relative paths
             allparts.insert(0, right)
             break
         else:
