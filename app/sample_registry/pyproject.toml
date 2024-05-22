@@ -149,6 +149,7 @@ register_host_species = "sample_registry.register:register_host_species"
 register_sample_types = "sample_registry.register:register_sample_types"
 export_samples = "sample_registry.export:export_samples"
 create_test_db = "sample_registry.db:create_test_db"
+sample_registry_version = "sample_registry:sample_registry_version"
 
 # This is configuration specific to the `setuptools` build backend.
 # If you are using a different build backend, you will need to change this.
