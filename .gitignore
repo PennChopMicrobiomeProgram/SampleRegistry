@@ -1,4 +1,7 @@
 *.pyc
 website/core.db
 *.egg-info
-
+build/
+__pycache__/
+*.sqlite3
+env/

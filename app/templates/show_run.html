@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block body %}
+{% if not run %}
+    <p>Run not found</p>
+{% else %}
+    {% if run|length > 1 %}
+        <b>WARNING: MULTIPLE RUNS FOUND WITH SAME ACCESSION. DISPLAYING FIRST BUT DATA CLEANUP SUGGESTED.</b>
+    {% endif %}
+    {% set run = run[0] %}
+
+    <form id="samplesForm">
+        <div id="samples_summary" class="summary span-24 last">
+            <h2>
+            <strong>Run {{ "CMR{:06d}".format(run.run_accession) }}</strong><br/>
+            <em>{{ run.comment }}</em>
+            </h2>
+            <ul>
+            <li><strong>Date:</strong> {{ "/".join(run.run_date.split("-")[1:][::-1]) }}</li>
+            <li><strong>Lane:</strong> {{ run.lane }}</li>
+            <li><strong>Platform:</strong> {{ run.machine_type }} {{ run.machine_kit }}</li>
+            <li><strong>Data file:</strong> <a href="respublica.research.chop.edu:/mnt/isilon/microbiome/{{ run.data_uri }}">{{ run.data_uri.split('/')|last }}</a></li>
+            </ul>
+            <p>
+            <strong>Export metadata for all samples:</strong><br />
+            <a href="{{ url_for('export_run', run_acc=run.run_accession|string + '.txt') }}">QIIME-compatible mapping file</a><br/>
+            <a href="{{ url_for('export_run', run_acc=run.run_accession|string + '.tsv') }}">Tab-delimited format (compatible with <code>read.delim</code> function in R)</a>
+            </p>
+        </div>
+
+        <table id="samples" class="display">
+            <thead>
+            <tr>
+                <th>Sample name</th>
+                <th>Barcode</th>
+                <th>Primer</th>
+                <th>Annotations (<a class="showAll" href="#">show all</a>, <a class="hideAll" href="#">hide all</a>)</th>
+            </tr>
+            </thead>
+            <tbody>
+        {% for sample in samples %}
+            <tr>
+                <td>{{ sample.sample_name }}</td>
+                <td>{{ sample.barcode_sequence|upper}}</td>
+                <td>{{ sample.primer_sequence|upper }}</td>
+                <td><div class="metadata toggle">
+                <ul>
+                    <li><strong>sample_accession</strong>:{{ "CMS{:06d}".format(sample.sample_accession) }}</li>
+                    <li><strong>SampleType</strong>:{{ sample.sample_type if sample.sample_type else "NA" }}</li>
+                    <li><strong>HostSpecies</strong>:{{ sample.host_species if sample.host_species else "NA" }}</li>
+                    <li><strong>SubjectID</strong>:{{ sample.subject_id if sample.subject_id else "NA" }}</li>
+
+                {% if sample.sample_accession in sample_metadata.keys() %}
+                    {% set annotations = sample_metadata[sample.sample_accession] %}
+                {% else %}
+                    {% set annotations = [] %}
+                {% endif %}
+
+                {% for a in annotations %}
+                    <li><strong>{{ a.key }}</strong>:{{ a.val }}</li>
+                {% endfor %}
+                </ul>
+                </div></td>
+            </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+    </form>
+{% endif %}
+
+<script type="text/javascript">
+$(document).ready(function () {
+    /* Set up data table */
+    $('#samples').dataTable({
+    "bSort": false,
+        "bPaginate": false,
+    });
+
+    /* Move search box to bottom of summary area */
+    $("#samples_filter").appendTo('#samples_summary');
+
+    /* Toggle detailed sample metadata */
+    $('.toggle').each(function() {
+        var nItems = $(this).find('li').length;
+        if (nItems > 0) {
+        var toggleText = nItems + ' annotations';
+        $(this).parent().prepend('<a href="#" class="toggleLink">' + toggleText + '</a>');
+    } else {
+        $(this).parent().prepend('None');
+    }
+        $(this).hide();
+    });
+
+    $('a.toggleLink').click(function() {
+        $(this).next().toggle();
+        return false; // do not follow link
+    });
+
+    $('a.showAll').click(function() {
+    $('.toggle').show();
+        return false;
+    });
+
+    $('a.hideAll').click(function() {
+    $('.toggle').hide();
+        return false;
+    });
+});
+</script>
+{% endblock %}
