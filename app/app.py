@@ -66,7 +66,6 @@ def show_tags(tag=None, val=None):
                 .filter(getattr(Sample, STANDARD_TAGS[tag]) == val)
                 .all()
             )
-            print(samples)
         else:
             annotations = (
                 db.session.query(Annotation)
@@ -93,7 +92,6 @@ def show_tags(tag=None, val=None):
                 )
                 .all()
             )
-            print
 
         sample_annotations = (
             db.session.query(Annotation)
@@ -201,23 +199,25 @@ def show_stats():
         .outerjoin(
             StandardSampleType, Sample.sample_type == StandardSampleType.sample_type
         )
-        .filter(StandardSampleType.sample_type == None)
+        .filter(StandardSampleType.sample_type is None)
         .group_by(Sample.sample_type)
         .order_by(db.func.count(Sample.sample_accession).desc())
         .all()
     )
 
     num_subjectid = (
-        db.session.query(Sample.subject_id).filter(Sample.subject_id != None).count()
+        db.session.query(Sample.subject_id)
+        .filter(Sample.subject_id is not None)
+        .count()
     )
     num_subjectid_with_hostspecies = (
         db.session.query(Sample.subject_id)
-        .filter(Sample.subject_id != None, Sample.host_species != None)
+        .filter(Sample.subject_id is not None, Sample.host_species is not None)
         .count()
     )
 
     num_samples_with_hostspecies = (
-        db.session.query(Sample).filter(Sample.host_species != None).count()
+        db.session.query(Sample).filter(Sample.host_species is not None).count()
     )
     num_samples_with_standard_hostspecies = (
         db.session.query(Sample)
@@ -242,7 +242,7 @@ def show_stats():
         .outerjoin(
             StandardHostSpecies, Sample.host_species == StandardHostSpecies.host_species
         )
-        .filter(StandardHostSpecies.host_species == None)
+        .filter(StandardHostSpecies.host_species is None)
         .group_by(Sample.host_species)
         .order_by(db.func.count(Sample.sample_accession).desc())
         .all()
@@ -256,12 +256,6 @@ def show_stats():
         .filter(Annotation.key == "ReversePrimerSequence")
         .distinct()
         .count()
-    )
-    print(
-        standard_sampletype_counts,
-        nonstandard_sampletype_counts,
-        standard_hostspecies_counts,
-        nonstandard_hostspecies_counts,
     )
 
     return render_template(
@@ -307,9 +301,6 @@ def export_run(run_acc):
                 a.key = "ReversePrimer"
 
         cols, table = cast_annotations(annotations, samples)
-
-        print(run)
-        print(samples)
 
         return render_template(
             "export_qiime.txt",
