@@ -16,7 +16,9 @@ jobs:
         with:
           python-version: 3.12
       - name: Install project
-        run: pip install app/sample_registry/ pytest pytest-cov
+        run: |
+          pip install app/sample_registry/ pytest pytest-cov
+          pip install -r requirements.txt
       - name: Run tests
         run: pytest -s -vvvv -l --tb=long app/sample_registry/test
       - name: Generate coverage report
@@ -50,7 +52,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install project
-        run: python -m pip install app/sample_registry/ pytest pytest-cov
+        run: |
+          python -m pip install app/sample_registry/ pytest pytest-cov
+          python -m pip install -r requirements.txt
       - name: Run tests
         run: pytest -s -vvvv -l --tb=long app/sample_registry/test
 

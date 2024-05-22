@@ -6,8 +6,10 @@ from sqlalchemy.orm import sessionmaker
 
 __version__ = "0.1.0"
 
+
 def sample_registry_version():
     sys.stderr.write(__version__)
+
 
 try:
     db_host = os.environ["DB_HOST"]

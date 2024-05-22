@@ -34,7 +34,7 @@ jobs:
           fi
 
   run-tests:
-    uses: .github/workflows/test.yml
+    uses: ./.github/workflows/test.yml
     secrets: inherit
     needs: check-version
   
