@@ -1,4 +1,3 @@
-import gzip
 import os.path
 import re
 

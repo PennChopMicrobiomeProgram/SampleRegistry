@@ -130,7 +130,7 @@ def show_tags(tag=None, val=None):
 @app.route("/runs/<run_acc>")
 def show_runs(run_acc=None):
     if run_acc:
-        run_acc = ''.join(filter(str.isdigit, run_acc.strip()))  # Sanitize run_acc
+        run_acc = "".join(filter(str.isdigit, run_acc.strip()))  # Sanitize run_acc
 
     if request.path.endswith(".json"):
         run = db.session.query(Run).filter(Run.run_accession == run_acc).all()
