@@ -1,5 +1,6 @@
 from sample_registry import session
-from sqlalchemy import insert, select
+from sqlalchemy import delete, insert, select, update
+from sample_registry.db import STANDARD_TAGS
 from sample_registry.mapping import SampleTable
 from sample_registry.models import Annotation, Sample, Run
 
@@ -47,26 +48,56 @@ class SampleRegistry(object):
             ],
         )
 
-    def remove_samples(self, run_accession):
-        accessions = self.db.query_sample_accessions(run_accession)
-        self.db.remove_annotations(accessions)
-        self.db.remove_samples(accessions)
-        return accessions
+    def remove_samples(self, run_accession: int) -> list[int]:
+        samples = session.scalars(
+            select(Sample.sample_accession).where(Sample.run_accession == run_accession)
+        )
+        session.execute(
+            delete(Annotation).where(Annotation.sample_accession.in_(samples))
+        )
+        session.execute(delete(Sample).where(Sample.run_accession == run_accession))
+        return samples
 
     def register_annotations(self, run_accession, sample_table):
         accessions = self._get_sample_accessions(run_accession, sample_table)
+
+        # Remove existing annotations
+        session.execute(
+            delete(Annotation).where(Annotation.sample_accession.in_(accessions))
+        )
+        session.execute(
+            update(Sample)
+            .where(Sample.sample_accession.in_(accessions))
+            .values({k: None for k in STANDARD_TAGS.values()})
+        )
+
+        # Register new annotations
+        standard_annotation_args = []
         annotation_args = []
         for a, pairs in zip(accessions, sample_table.annotations):
             for k, v in pairs:
-                annotation_args.append((a, k, v))
-        self.db.remove_annotations(accessions)
-        self.db.register_annotations(annotation_args)
+                if k in STANDARD_TAGS:
+                    standard_annotation_args.append((a, STANDARD_TAGS[k], v))
+                else:
+                    annotation_args.append((a, k, v))
+
+        for a, k, v in standard_annotation_args:
+            session.execute(update(Sample).where(Sample.sample_accession == a)).values(
+                {k: v}
+            )
+        session.execute(insert(Annotation), annotation_args)
 
     def _get_sample_accessions(self, run_accession, sample_table):
-        args = [(run_accession, n, b) for n, b in sample_table.core_info]
-        accessions = self.db.query_barcoded_sample_accessions(
-            run_accession, sample_table.core_info
+        sample_tups = [
+            (sample_name, barcode_sequence)
+            for sample_name, barcode_sequence in sample_table.core_info
+        ]
+        accessions = select(Sample).where(
+            Sample.run_accession == run_accession
+            and Sample.sample_name.in_([s[0] for s in sample_tups])
+            and Sample.barcode_sequence.in_([s[1] for s in sample_tups])
         )
+
         unaccessioned_recs = []
         for accession, rec in zip(accessions, sample_table.recs):
             if accession is None:
