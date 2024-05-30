@@ -3,7 +3,7 @@
 import argparse
 import sys
 import gzip
-from sample_registry import session
+from typing import Generator
 from sample_registry.mapping import SampleTable
 from sample_registry.illumina import IlluminaFastq
 from sample_registry.registrar import SampleRegistry
@@ -80,7 +80,7 @@ def register_sample_annotations(argv=None, register_samples=False, out=sys.stdou
     registry.register_annotations(args.run_accession, sample_table)
 
 
-def parse_tsv_ncol(f, ncol):
+def parse_tsv_ncol(f, ncol: int) -> Generator[tuple[str], None, None]:
     assert ncol > 0
     # Skip header
     next(f)
@@ -104,8 +104,8 @@ def register_sample_types(argv=None, out=sys.stdout):
     args = p.parse_args(argv)
 
     sample_types = list(parse_tsv_ncol(args.file, 3))
-    db.remove_standard_sample_types()
-    db.register_standard_sample_types(sample_types)
+    registry.remove_standard_sample_types()
+    registry.register_standard_sample_types(sample_types)
 
 
 def register_host_species(argv=None, out=sys.stdout):
@@ -116,8 +116,8 @@ def register_host_species(argv=None, out=sys.stdout):
     args = p.parse_args(argv)
 
     host_species = list(parse_tsv_ncol(args.file, 3))
-    db.remove_standard_host_species()
-    db.register_standard_host_species(host_species)
+    registry.remove_standard_host_species()
+    registry.register_standard_host_species(host_species)
 
 
 def register_illumina_file(argv=None, out=sys.stdout):
@@ -129,7 +129,7 @@ def register_illumina_file(argv=None, out=sys.stdout):
     args = p.parse_args(argv)
 
     f = IlluminaFastq(gzip.open(args.file, "rt"))
-    acc = db.register_run(
+    acc = registry.register_run(
         f.date, f.machine_type, "Nextera XT", f.lane, f.filepath, args.comment
     )
     out.write("Registered run {0} in the database\n".format(acc))
@@ -149,7 +149,7 @@ def register_run(argv=None, out=sys.stdout):
     p.add_argument("--lane", default="1", help="Lane number")
     args = p.parse_args(argv)
 
-    acc = db.register_run(
+    acc = registry.register_run(
         args.date, args.type, "Nextera XT", args.lane, args.file, args.comment
     )
     out.write("Registered run %s in the database\n" % acc)

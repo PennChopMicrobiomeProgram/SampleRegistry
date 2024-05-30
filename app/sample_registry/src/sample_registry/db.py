@@ -6,7 +6,8 @@ import os.path
 import sqlite3
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-from . import SQLALCHEMY_DATABASE_URI, engine, session
+from sqlalchemy import delete
+from sqlalchemy.orm import sessionmaker
 from .models import (
     Base,
     Run,
@@ -24,9 +25,20 @@ STANDARD_TAGS = {
 }
 
 
-def create_test_db():
-    print(SQLALCHEMY_DATABASE_URI)
-    Base.metadata.create_all(engine)
+def create_test_db(session: sessionmaker = None):
+    if not session:
+        from . import engine
+        from . import session as imported_session
+
+        session = imported_session
+        Base.metadata.create_all(engine)
+
+    if session.query(Run).count() > 0:
+        session.execute(delete(Run))
+        session.execute(delete(Sample))
+        session.execute(delete(Annotation))
+        session.execute(delete(StandardSampleType))
+        session.execute(delete(StandardHostSpecies))
 
     run1 = Run(
         run_accession=1,
@@ -116,7 +128,7 @@ def create_test_db():
     )
 
     try:
-        init_standard_sample_types()
+        init_standard_sample_types(session)
     except FileNotFoundError:
         session.add(
             StandardSampleType(
@@ -136,7 +148,7 @@ def create_test_db():
         )
 
     try:
-        init_standard_host_species()
+        init_standard_host_species(session)
     except FileNotFoundError:
         session.add(
             StandardHostSpecies(
@@ -152,7 +164,7 @@ def create_test_db():
     session.commit()
 
 
-def init_standard_sample_types():
+def init_standard_sample_types(session: sessionmaker):
     with open("standard_sample_types.tsv", "r") as file:
         reader = csv.reader(file, delimiter="\t")
         next(reader)  # Skip header row
@@ -173,7 +185,7 @@ def init_standard_sample_types():
         session.bulk_save_objects(sample_types)
 
 
-def init_standard_host_species():
+def init_standard_host_species(session: sessionmaker):
     with open("standard_host_species.tsv", "r") as file:
         reader = csv.reader(file, delimiter="\t")
         next(reader)  # Skip header row

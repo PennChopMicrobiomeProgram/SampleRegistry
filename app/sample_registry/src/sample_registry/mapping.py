@@ -1,6 +1,7 @@
 """Read, validate, and write sample info tables"""
 
 import string
+from typing import Generator, TextIO
 
 
 class SampleTable(object):
@@ -26,18 +27,18 @@ class SampleTable(object):
         self.recs = recs
         self._remove("Description")
 
-    def _remove(self, field):
+    def _remove(self, field: str):
         for r in self.recs:
             if field in r:
                 del r[field]
 
     @property
-    def core_info(self):
+    def core_info(self) -> Generator[tuple[str, str], None, None]:
         for r in self.recs:
             yield tuple(r.get(f, "") for f in self.CORE_FIELDS)
 
     @property
-    def annotations(self):
+    def annotations(self) -> Generator[list[tuple[str, str]], None, None]:
         for r in self.recs:
             annotation_keys = set(r.keys()) - set(self.CORE_FIELDS)
             yield [(k, r[k]) for k in annotation_keys]
@@ -46,14 +47,14 @@ class SampleTable(object):
         _validate_sample_ids(self.recs)
         _validate_barcodes(self.recs)
 
-    def write(self, f):
+    def write(self, f: TextIO):
         rows = _cast(self.recs, self.CORE_FIELDS, [])
         for row in rows:
             f.write("\t".join(row))
             f.write("\n")
 
     @classmethod
-    def load(cls, f):
+    def load(cls, f: TextIO) -> "SampleTable":
         recs = list(cls._parse(f))
         if not recs:
             raise ValueError(
@@ -63,7 +64,7 @@ class SampleTable(object):
         return cls(recs)
 
     @classmethod
-    def _parse(cls, f):
+    def _parse(cls, f: TextIO) -> Generator[dict[str, str], None, None]:
         """Parse mapping file, return each record as a dict."""
         header = next(f).lstrip("#")
         keys = cls._tokenize(header)
@@ -77,7 +78,7 @@ class SampleTable(object):
             yield dict([(k, v) for k, v in zip(keys, vals) if v not in cls.NAs])
 
     @classmethod
-    def _tokenize(cls, line):
+    def _tokenize(cls, line: str) -> list[str]:
         """Tokenize a single line"""
         line = line.rstrip("\n\r")
         toks = line.split("\t")
