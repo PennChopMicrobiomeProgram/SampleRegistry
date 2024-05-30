@@ -3,6 +3,7 @@
 import argparse
 import sys
 import gzip
+from sqlalchemy.orm import Session
 from typing import Generator
 from sample_registry.mapping import SampleTable
 from sample_registry.illumina import IlluminaFastq
@@ -33,16 +34,14 @@ as comments.
 """
 
 
-registry = SampleRegistry()
-
-
-def unregister_samples(argv=None, out=sys.stdout):
+def unregister_samples(argv=None, out=sys.stdout, session: Session = None):
     p = argparse.ArgumentParser(
         description="Remove samples for a sequencing run from the registry."
     )
     p.add_argument("run_accession", type=int, help="Run accession number")
     args = p.parse_args(argv)
 
+    registry = SampleRegistry(session)
     registry.check_run_accession(args.run_accession)
 
     samples_removed = registry.remove_samples(args.run_accession)
@@ -57,8 +56,9 @@ def register_annotations():
     return register_sample_annotations(None, False)
 
 
-def register_sample_annotations(argv=None, register_samples=False, out=sys.stdout):
-
+def register_sample_annotations(
+    argv=None, register_samples=False, out=sys.stdout, session: Session = None
+):
     if register_samples:
         p = argparse.ArgumentParser(description=SAMPLES_DESC)
     else:
@@ -73,7 +73,7 @@ def register_sample_annotations(argv=None, register_samples=False, out=sys.stdou
     sample_table.look_up_nextera_barcodes()
     sample_table.validate()
 
-    registry = SampleRegistry()
+    registry = SampleRegistry(session)
     registry.check_run_accession(args.run_accession)
     if register_samples:
         registry.register_samples(args.run_accession, sample_table)
@@ -96,31 +96,33 @@ def parse_tsv_ncol(f, ncol: int) -> Generator[tuple[str], None, None]:
         yield tuple(vals[:ncol])
 
 
-def register_sample_types(argv=None, out=sys.stdout):
+def register_sample_types(argv=None, out=sys.stdout, session: Session = None):
     p = argparse.ArgumentParser(
         description=("Update the list of standard sample types in the registry")
     )
     p.add_argument("file", type=argparse.FileType("r"))
     args = p.parse_args(argv)
 
+    registry = SampleRegistry(session)
     sample_types = list(parse_tsv_ncol(args.file, 3))
     registry.remove_standard_sample_types()
     registry.register_standard_sample_types(sample_types)
 
 
-def register_host_species(argv=None, out=sys.stdout):
+def register_host_species(argv=None, out=sys.stdout, session: Session = None):
     p = argparse.ArgumentParser(
         description=("Update the list of standard host species in the registry")
     )
     p.add_argument("file", type=argparse.FileType("r"))
     args = p.parse_args(argv)
 
+    registry = SampleRegistry(session)
     host_species = list(parse_tsv_ncol(args.file, 3))
     registry.remove_standard_host_species()
     registry.register_standard_host_species(host_species)
 
 
-def register_illumina_file(argv=None, out=sys.stdout):
+def register_illumina_file(argv=None, out=sys.stdout, session: Session = None):
     p = argparse.ArgumentParser(
         description=("Add a new run to the registry from a gzipped Illumina FASTQ file")
     )
@@ -128,6 +130,7 @@ def register_illumina_file(argv=None, out=sys.stdout):
     p.add_argument("comment", help="Comment (free text)")
     args = p.parse_args(argv)
 
+    registry = SampleRegistry(session)
     f = IlluminaFastq(gzip.open(args.file, "rt"))
     acc = registry.register_run(
         f.date, f.machine_type, "Nextera XT", f.lane, f.filepath, args.comment
@@ -135,7 +138,7 @@ def register_illumina_file(argv=None, out=sys.stdout):
     out.write("Registered run {0} in the database\n".format(acc))
 
 
-def register_run(argv=None, out=sys.stdout):
+def register_run(argv=None, out=sys.stdout, session: Session = None):
     p = argparse.ArgumentParser(description="Add a new run to the registry")
     p.add_argument("file", help="Resource filepath (not checked)")
     p.add_argument("--date", required=True, help="Run date (YYYY-MM-DD)")
@@ -149,6 +152,7 @@ def register_run(argv=None, out=sys.stdout):
     p.add_argument("--lane", default="1", help="Lane number")
     args = p.parse_args(argv)
 
+    registry = SampleRegistry(session)
     acc = registry.register_run(
         args.date, args.type, "Nextera XT", args.lane, args.file, args.comment
     )

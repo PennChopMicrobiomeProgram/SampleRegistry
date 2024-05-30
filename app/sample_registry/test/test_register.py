@@ -1,13 +1,18 @@
 import gzip
 import io
 import os
+import pytest
 import shutil
 import tempfile
 import unittest
 
-from sample_registry.db import RegistryDatabase
-from sample_registry.mapping import SampleTable
-from sample_registry.register import (
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
+from typing import Generator
+from src.sample_registry.db import create_test_db
+from src.sample_registry.mapping import SampleTable
+from src.sample_registry.models import Base
+from src.sample_registry.register import (
     register_run,
     register_sample_annotations,
     unregister_samples,
@@ -17,7 +22,48 @@ from sample_registry.register import (
 )
 
 
-def temp_sample_file(samples):
+samples = [
+    {
+        "SampleID": "abc123",
+        "BarcodeSequence": "GGGCCT",
+        "SampleType": "Oral swab",
+        "bb": "cd e29",
+    }
+]
+
+run_args = [
+    "abc",
+    "--lane",
+    "1",
+    "--date",
+    "2008-09-21",
+    "--type",
+    "Illumina-MiSeq",
+    "--comment",
+    "mdsnfa adsf",
+]
+
+
+@pytest.fixture()
+def db() -> Generator[Session, None, None]:
+    # This fixture should run before every test and create a new in-memory SQLite test database with identical data
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=False)
+    Base.metadata.create_all(engine)
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    create_test_db(session)
+
+    yield session
+
+    session.rollback()
+    session.close()
+
+
+@pytest.fixture
+def temp_sample_file():
     f = tempfile.NamedTemporaryFile(mode="wt")
     t = SampleTable(samples)
     t.write(f)
@@ -25,29 +71,18 @@ def temp_sample_file(samples):
     return f
 
 
+def test_register_run(db, temp_sample_file):
+    out = io.StringIO()
+    register_run(run_args, temp_sample_file, out=out, session=db)
+
+    # Check that accession number is printed
+    assert out.getvalue() == "Registered run 3 in the database\n"
+
+    # Check that attributes are saved in the database
+    assert db.scalar() == "abc"
+
+
 class RegisterScriptTests(unittest.TestCase):
-    def setUp(self):
-        self.db = RegistryDatabase(":memory:")
-        self.db.create_tables()
-        self.run_args = [
-            "abc",
-            "--lane",
-            "1",
-            "--date",
-            "2008-09-21",
-            "--type",
-            "Illumina-MiSeq",
-            "--comment",
-            "mdsnfa adsf",
-        ]
-        self.samples = [
-            {
-                "SampleID": "abc123",
-                "BarcodeSequence": "GGGCCT",
-                "SampleType": "Oral swab",
-                "bb": "cd e29",
-            }
-        ]
 
     def test_register_run(self):
         out = io.StringIO()

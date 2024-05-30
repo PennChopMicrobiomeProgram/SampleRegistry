@@ -1,4 +1,5 @@
 from sqlalchemy import delete, insert, select, update
+from sqlalchemy.orm import Session
 from sample_registry.db import STANDARD_TAGS
 from sample_registry.mapping import SampleTable
 from sample_registry.models import (
@@ -19,7 +20,7 @@ class SampleRegistry(object):
     ]
     kits = ["Nextera XT"]
 
-    def __init__(self, session):
+    def __init__(self, session: Session = None):
         if session:
             self.session = session
         else:
@@ -41,7 +42,7 @@ class SampleRegistry(object):
         lane: int,
         data_uri: str,
         comment: str,
-    ) -> Run:
+    ) -> int:
         return self.session.scalar(
             insert(Run)
             .returning(Run.run_accession)

@@ -76,7 +76,7 @@ def test_register_run(db):
 def test_register_samples(db):
     registry = SampleRegistry(db)
     sample_table = SampleTable(recs)
-    sample_accessions = registry.register_samples(3, sample_table)
+    registry.register_samples(3, sample_table)
 
     assert (
         db.scalar(
