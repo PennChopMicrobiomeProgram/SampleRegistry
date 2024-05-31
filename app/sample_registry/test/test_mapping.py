@@ -43,7 +43,7 @@ def test_parse():
 
 def test_validate():
     t = SampleTable(recs)
-    assert t.validate() == None
+    assert t.validate() is None
 
 
 def test_validate_with_duplicated_sample_name():

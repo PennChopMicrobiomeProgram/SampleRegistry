@@ -89,8 +89,9 @@ def test_register_samples(db):
 def test_register_samples_already_registered(db):
     registry = SampleRegistry(db)
     sample_table = SampleTable(recs)
+    registry.register_samples(3, sample_table)
     with pytest.raises(ValueError):
-        registry.register_samples(1, sample_table)
+        registry.register_samples(3, sample_table)
 
 
 def test_remove_samples(db):

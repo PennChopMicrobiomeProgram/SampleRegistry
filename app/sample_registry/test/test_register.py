@@ -103,7 +103,6 @@ def temp_modified_sample_file():
 
 def test_register_run(db, temp_sample_file):
     out = io.StringIO()
-    run_args[0] == temp_sample_file.name
     register_run(run_args, db, out)
 
     # Check that accession number is printed
@@ -139,7 +138,6 @@ def test_register_illumina_file(tmpdir, db):
 
 def test_register_samples(db, temp_sample_file):
     register_run(run_args, db)
-    out = io.StringIO()
     sample_file = temp_sample_file
     args = ["3", sample_file.name]
     register_sample_annotations(args, True, db)
