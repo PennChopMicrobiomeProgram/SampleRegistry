@@ -4,6 +4,7 @@ Library for adding/modifying/deleting sequencing runs and associated metadata wi
 
 [![Tests](https://github.com/PennChopMicrobiomeProgram/SampleRegistry/actions/workflows/pr.yml/badge.svg)](https://github.com/PennChopMicrobiomeProgram/SampleRegistry/actions/workflows/pr.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/5086d0c90973460a82b72ac90dfe3199)](https://app.codacy.com/gh/PennChopMicrobiomeProgram/SampleRegistry/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![codecov](https://codecov.io/gh/PennChopMicrobiomeProgram/SampleRegistry/graph/badge.svg?token=ONUY5PYY9W)](https://codecov.io/gh/PennChopMicrobiomeProgram/SampleRegistry)
 [![DockerHub](https://img.shields.io/docker/pulls/ctbushman/sample_registry)](https://hub.docker.com/repository/docker/ctbushman/sample_registry/)
 
 ## Development
