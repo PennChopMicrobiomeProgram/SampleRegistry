@@ -99,7 +99,7 @@ def create_test_db(session: sessionmaker = None):
 
     annotations = [
         Annotation(
-            sample_accession=sample.sample_accession, key=f"key{i % 2}", val=f"val{i}"
+            sample_accession=sample.sample_accession, key=f"key{i}", val=f"val{i % 2}"
         )
         for i, sample in enumerate(
             [sample1, sample2, sample3, sample4, sample1, sample2, sample3, sample4]

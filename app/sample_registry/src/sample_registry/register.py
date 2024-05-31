@@ -34,7 +34,7 @@ as comments.
 """
 
 
-def unregister_samples(argv=None, out=sys.stdout, session: Session = None):
+def unregister_samples(argv=None, session: Session = None, out=sys.stdout):
     p = argparse.ArgumentParser(
         description="Remove samples for a sequencing run from the registry."
     )
@@ -43,7 +43,6 @@ def unregister_samples(argv=None, out=sys.stdout, session: Session = None):
 
     registry = SampleRegistry(session)
     registry.check_run_accession(args.run_accession)
-
     samples_removed = registry.remove_samples(args.run_accession)
     out.write("Removed {0} samples: {1}".format(len(samples_removed), samples_removed))
 
@@ -57,7 +56,7 @@ def register_annotations():
 
 
 def register_sample_annotations(
-    argv=None, register_samples=False, out=sys.stdout, session: Session = None
+    argv=None, register_samples=False, session: Session = None
 ):
     if register_samples:
         p = argparse.ArgumentParser(description=SAMPLES_DESC)
@@ -96,7 +95,7 @@ def parse_tsv_ncol(f, ncol: int) -> Generator[tuple[str], None, None]:
         yield tuple(vals[:ncol])
 
 
-def register_sample_types(argv=None, out=sys.stdout, session: Session = None):
+def register_sample_types(argv=None, session: Session = None):
     p = argparse.ArgumentParser(
         description=("Update the list of standard sample types in the registry")
     )
@@ -109,7 +108,7 @@ def register_sample_types(argv=None, out=sys.stdout, session: Session = None):
     registry.register_standard_sample_types(sample_types)
 
 
-def register_host_species(argv=None, out=sys.stdout, session: Session = None):
+def register_host_species(argv=None, session: Session = None):
     p = argparse.ArgumentParser(
         description=("Update the list of standard host species in the registry")
     )
@@ -122,7 +121,7 @@ def register_host_species(argv=None, out=sys.stdout, session: Session = None):
     registry.register_standard_host_species(host_species)
 
 
-def register_illumina_file(argv=None, out=sys.stdout, session: Session = None):
+def register_illumina_file(argv=None, session: Session = None, out=sys.stdout):
     p = argparse.ArgumentParser(
         description=("Add a new run to the registry from a gzipped Illumina FASTQ file")
     )
@@ -138,7 +137,7 @@ def register_illumina_file(argv=None, out=sys.stdout, session: Session = None):
     out.write("Registered run {0} in the database\n".format(acc))
 
 
-def register_run(argv=None, out=sys.stdout, session: Session = None):
+def register_run(argv=None, session: Session = None, out=sys.stdout):
     p = argparse.ArgumentParser(description="Add a new run to the registry")
     p.add_argument("file", help="Resource filepath (not checked)")
     p.add_argument("--date", required=True, help="Run date (YYYY-MM-DD)")

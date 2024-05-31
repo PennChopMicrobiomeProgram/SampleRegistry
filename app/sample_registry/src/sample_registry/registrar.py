@@ -1,4 +1,4 @@
-from sqlalchemy import delete, insert, select, update
+from sqlalchemy import and_, delete, insert, select, update
 from sqlalchemy.orm import Session
 from sample_registry.db import STANDARD_TAGS
 from sample_registry.mapping import SampleTable
@@ -67,9 +67,11 @@ class SampleRegistry(object):
         ]
         if self.session.scalars(
             select(Sample).where(
-                Sample.run_accession == run_accession
-                and Sample.sample_name.in_([s[0] for s in sample_tups])
-                and Sample.barcode_sequence.in_([s[1] for s in sample_tups])
+                and_(
+                    Sample.run_accession == run_accession,
+                    Sample.sample_name.in_([s[0] for s in sample_tups]),
+                    Sample.barcode_sequence.in_([s[1] for s in sample_tups]),
+                )
             )
         ).first():
             raise ValueError("Samples already registered for run %s" % run_accession)
@@ -92,7 +94,7 @@ class SampleRegistry(object):
     def remove_samples(self, run_accession: int) -> list[int]:
         samples = self.session.scalars(
             select(Sample.sample_accession).where(Sample.run_accession == run_accession)
-        )
+        ).all()
         self.session.execute(
             delete(Annotation).where(Annotation.sample_accession.in_(samples))
         )
@@ -126,8 +128,8 @@ class SampleRegistry(object):
 
         for a, k, v in standard_annotation_args:
             self.session.execute(
-                update(Sample).where(Sample.sample_accession == a)
-            ).values({k: v})
+                update(Sample).where(Sample.sample_accession == a).values({k: v})
+            )
 
         if annotation_args:
             return self.session.scalars(
@@ -143,18 +145,22 @@ class SampleRegistry(object):
         else:
             return []
 
-    def _get_sample_accessions(self, run_accession, sample_table):
+    def _get_sample_accessions(
+        self, run_accession: int, sample_table: SampleTable
+    ) -> list[int]:
         sample_tups = [
             (sample_name, barcode_sequence)
             for sample_name, barcode_sequence in sample_table.core_info
         ]
         accessions = self.session.scalars(
-            select(Sample).where(
-                Sample.run_accession == run_accession
-                and Sample.sample_name.in_([s[0] for s in sample_tups])
-                and Sample.barcode_sequence.in_([s[1] for s in sample_tups])
+            select(Sample.sample_accession).where(
+                and_(
+                    Sample.run_accession == run_accession,
+                    Sample.sample_name.in_([s[0] for s in sample_tups]),
+                    Sample.barcode_sequence.in_([s[1] for s in sample_tups]),
+                )
             )
-        )
+        ).all()
 
         unaccessioned_recs = []
         for accession, rec in zip(accessions, sample_table.recs):
