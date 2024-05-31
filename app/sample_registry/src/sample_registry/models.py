@@ -54,7 +54,7 @@ class StandardSampleType(Base):
     sample_type: Mapped[str] = mapped_column(primary_key=True)
     rarity: Mapped[str]
     host_associated: Mapped[bool]
-    comment: Mapped[str]
+    comment: Mapped[Optional[str]] = mapped_column(nullable=True)
 
     def __repr__(self):
         return f"StandardSampleType(sample_type={self.sample_type}, rarity={self.rarity}, host_associated={self.host_associated}, comment={self.comment})"

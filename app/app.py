@@ -129,6 +129,9 @@ def show_tags(tag=None, val=None):
 @app.route("/runs")
 @app.route("/runs/<run_acc>")
 def show_runs(run_acc=None):
+    if run_acc:
+        run_acc = "".join(filter(str.isdigit, run_acc.strip()))  # Sanitize run_acc
+
     if request.path.endswith(".json"):
         run = db.session.query(Run).filter(Run.run_accession == run_acc).all()
         with open(f"run_{run_acc}", "wb") as f:  # TEMP
@@ -176,7 +179,7 @@ def show_runs(run_acc=None):
 def show_stats():
     num_samples = db.session.query(Sample).count()
     num_samples_with_sampletype = (
-        db.session.query(Sample).filter(Sample.sample_type != None).count()
+        db.session.query(Sample).filter(Sample.sample_type is not None).count()
     )
     num_samples_with_standard_sampletype = (
         db.session.query(Sample)

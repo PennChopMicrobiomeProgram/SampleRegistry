@@ -1,18 +1,13 @@
 """Add samples and runs to the registry"""
 
 import argparse
-import itertools
-import os
-import re
 import sys
 import gzip
-
-from sample_registry.db import RegistryDatabase
+from sqlalchemy.orm import Session
+from typing import Generator
 from sample_registry.mapping import SampleTable
 from sample_registry.illumina import IlluminaFastq
-
-
-REGISTRY_DATABASE = RegistryDatabase("/var/local/sample_registry/core.db")
+from sample_registry.registrar import SampleRegistry
 
 
 SAMPLES_DESC = """\
@@ -39,14 +34,14 @@ as comments.
 """
 
 
-def unregister_samples(argv=None, db=REGISTRY_DATABASE, out=sys.stdout):
+def unregister_samples(argv=None, session: Session = None, out=sys.stdout):
     p = argparse.ArgumentParser(
         description="Remove samples for a sequencing run from the registry."
     )
     p.add_argument("run_accession", type=int, help="Run accession number")
     args = p.parse_args(argv)
 
-    registry = SampleRegistry(db)
+    registry = SampleRegistry(session)
     registry.check_run_accession(args.run_accession)
     samples_removed = registry.remove_samples(args.run_accession)
     out.write("Removed {0} samples: {1}".format(len(samples_removed), samples_removed))
@@ -61,9 +56,8 @@ def register_annotations():
 
 
 def register_sample_annotations(
-    argv=None, register_samples=False, db=REGISTRY_DATABASE, out=sys.stdout
+    argv=None, register_samples=False, session: Session = None
 ):
-
     if register_samples:
         p = argparse.ArgumentParser(description=SAMPLES_DESC)
     else:
@@ -78,14 +72,14 @@ def register_sample_annotations(
     sample_table.look_up_nextera_barcodes()
     sample_table.validate()
 
-    registry = SampleRegistry(db)
+    registry = SampleRegistry(session)
     registry.check_run_accession(args.run_accession)
     if register_samples:
         registry.register_samples(args.run_accession, sample_table)
     registry.register_annotations(args.run_accession, sample_table)
 
 
-def parse_tsv_ncol(f, ncol):
+def parse_tsv_ncol(f, ncol: int) -> Generator[tuple[str], None, None]:
     assert ncol > 0
     # Skip header
     next(f)
@@ -101,31 +95,33 @@ def parse_tsv_ncol(f, ncol):
         yield tuple(vals[:ncol])
 
 
-def register_sample_types(argv=None, db=REGISTRY_DATABASE, out=sys.stdout):
+def register_sample_types(argv=None, session: Session = None):
     p = argparse.ArgumentParser(
         description=("Update the list of standard sample types in the registry")
     )
     p.add_argument("file", type=argparse.FileType("r"))
     args = p.parse_args(argv)
 
+    registry = SampleRegistry(session)
     sample_types = list(parse_tsv_ncol(args.file, 3))
-    db.remove_standard_sample_types()
-    db.register_standard_sample_types(sample_types)
+    registry.remove_standard_sample_types()
+    registry.register_standard_sample_types(sample_types)
 
 
-def register_host_species(argv=None, db=REGISTRY_DATABASE, out=sys.stdout):
+def register_host_species(argv=None, session: Session = None):
     p = argparse.ArgumentParser(
         description=("Update the list of standard host species in the registry")
     )
     p.add_argument("file", type=argparse.FileType("r"))
     args = p.parse_args(argv)
 
+    registry = SampleRegistry(session)
     host_species = list(parse_tsv_ncol(args.file, 3))
-    db.remove_standard_host_species()
-    db.register_standard_host_species(host_species)
+    registry.remove_standard_host_species()
+    registry.register_standard_host_species(host_species)
 
 
-def register_illumina_file(argv=None, db=REGISTRY_DATABASE, out=sys.stdout):
+def register_illumina_file(argv=None, session: Session = None, out=sys.stdout):
     p = argparse.ArgumentParser(
         description=("Add a new run to the registry from a gzipped Illumina FASTQ file")
     )
@@ -133,14 +129,15 @@ def register_illumina_file(argv=None, db=REGISTRY_DATABASE, out=sys.stdout):
     p.add_argument("comment", help="Comment (free text)")
     args = p.parse_args(argv)
 
+    registry = SampleRegistry(session)
     f = IlluminaFastq(gzip.open(args.file, "rt"))
-    acc = db.register_run(
+    acc = registry.register_run(
         f.date, f.machine_type, "Nextera XT", f.lane, f.filepath, args.comment
     )
     out.write("Registered run {0} in the database\n".format(acc))
 
 
-def register_run(argv=None, db=REGISTRY_DATABASE, out=sys.stdout):
+def register_run(argv=None, session: Session = None, out=sys.stdout):
     p = argparse.ArgumentParser(description="Add a new run to the registry")
     p.add_argument("file", help="Resource filepath (not checked)")
     p.add_argument("--date", required=True, help="Run date (YYYY-MM-DD)")
@@ -154,55 +151,8 @@ def register_run(argv=None, db=REGISTRY_DATABASE, out=sys.stdout):
     p.add_argument("--lane", default="1", help="Lane number")
     args = p.parse_args(argv)
 
-    acc = db.register_run(
+    registry = SampleRegistry(session)
+    acc = registry.register_run(
         args.date, args.type, "Nextera XT", args.lane, args.file, args.comment
     )
     out.write("Registered run %s in the database\n" % acc)
-
-
-class SampleRegistry(object):
-    machines = [
-        "Illumina-MiSeq",
-        "Illumina-HiSeq",
-        "Illumina-NovaSeq",
-        "Illumina-MiniSeq",
-    ]
-    kits = ["Nextera XT"]
-
-    def __init__(self, registry_db):
-        self.db = registry_db
-
-    def check_run_accession(self, acc):
-        if not self.db.query_run_exists(acc):
-            raise ValueError("Run does not exist %s" % acc)
-
-    def register_samples(self, run_accession, sample_table):
-        self.db.register_samples(run_accession, sample_table.core_info)
-
-    def remove_samples(self, run_accession):
-        accessions = self.db.query_sample_accessions(run_accession)
-        self.db.remove_annotations(accessions)
-        self.db.remove_samples(accessions)
-        return accessions
-
-    def register_annotations(self, run_accession, sample_table):
-        accessions = self._get_sample_accessions(run_accession, sample_table)
-        annotation_args = []
-        for a, pairs in zip(accessions, sample_table.annotations):
-            for k, v in pairs:
-                annotation_args.append((a, k, v))
-        self.db.remove_annotations(accessions)
-        self.db.register_annotations(annotation_args)
-
-    def _get_sample_accessions(self, run_accession, sample_table):
-        args = [(run_accession, n, b) for n, b in sample_table.core_info]
-        accessions = self.db.query_barcoded_sample_accessions(
-            run_accession, sample_table.core_info
-        )
-        unaccessioned_recs = []
-        for accession, rec in zip(accessions, sample_table.recs):
-            if accession is None:
-                unaccessioned_recs.append(rec)
-        if unaccessioned_recs:
-            raise IOError("Not accessioned: %s" % unaccessioned_recs)
-        return accessions
