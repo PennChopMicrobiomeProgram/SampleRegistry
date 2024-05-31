@@ -1,0 +1,97 @@
+﻿SampleID,investigator,project_name,tube_barcode,box_id,box_position,sample_type,subject_id,host_species,study_day,study_group,current_antibiotics,date_collected,time_collected,mouse_strain,cage_id
+YoungMaleControl1,Ricciotti,ER1_Celecoxib_Naproxen,101,ER_Cele_Nap_Young,1,Large intestine lumen,YoungMaleControl1,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungMaleControl2,Ricciotti,ER1_Celecoxib_Naproxen,102,ER_Cele_Nap_Young,2,Large intestine lumen,YoungMaleControl2,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungMaleControl3,Ricciotti,ER1_Celecoxib_Naproxen,202,ER_Cele_Nap_Young,3,Large intestine lumen,YoungMaleControl3,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungMaleControl4,Ricciotti,ER1_Celecoxib_Naproxen,203,ER_Cele_Nap_Young,4,Large intestine lumen,YoungMaleControl4,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungMaleControl5,Ricciotti,ER1_Celecoxib_Naproxen,402,ER_Cele_Nap_Young,5,Large intestine lumen,YoungMaleControl5,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungMaleCelecoxib1,Ricciotti,ER1_Celecoxib_Naproxen,103,ER_Cele_Nap_Young,6,Large intestine lumen,YoungMaleCelecoxib1,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungMaleCelecoxib2,Ricciotti,ER1_Celecoxib_Naproxen,104,ER_Cele_Nap_Young,7,Large intestine lumen,YoungMaleCelecoxib2,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungMaleCelecoxib3,Ricciotti,ER1_Celecoxib_Naproxen,201,ER_Cele_Nap_Young,8,Large intestine lumen,YoungMaleCelecoxib3,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungMaleCelecoxib4,Ricciotti,ER1_Celecoxib_Naproxen,205,ER_Cele_Nap_Young,9,Large intestine lumen,YoungMaleCelecoxib4,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungMaleCelecoxib5,Ricciotti,ER1_Celecoxib_Naproxen,305,ER_Cele_Nap_Young,10,Large intestine lumen,YoungMaleCelecoxib5,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungMaleCelecoxib6,Ricciotti,ER1_Celecoxib_Naproxen,401,ER_Cele_Nap_Young,11,Large intestine lumen,YoungMaleCelecoxib6,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungMaleNaproxen1,Ricciotti,ER1_Celecoxib_Naproxen,105,ER_Cele_Nap_Young,12,Large intestine lumen,YoungMaleNaproxen1,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungMaleNaproxen2,Ricciotti,ER1_Celecoxib_Naproxen,204,ER_Cele_Nap_Young,13,Large intestine lumen,YoungMaleNaproxen2,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungMaleNaproxen3,Ricciotti,ER1_Celecoxib_Naproxen,301,ER_Cele_Nap_Young,14,Large intestine lumen,YoungMaleNaproxen3,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungMaleNaproxen4,Ricciotti,ER1_Celecoxib_Naproxen,302,ER_Cele_Nap_Young,15,Large intestine lumen,YoungMaleNaproxen4,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungMaleNaproxen5,Ricciotti,ER1_Celecoxib_Naproxen,303,ER_Cele_Nap_Young,16,Large intestine lumen,YoungMaleNaproxen5,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungMaleNaproxen6,Ricciotti,ER1_Celecoxib_Naproxen,304,ER_Cele_Nap_Young,17,Large intestine lumen,YoungMaleNaproxen6,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungMaleNaproxen7,Ricciotti,ER1_Celecoxib_Naproxen,404,ER_Cele_Nap_Young,18,Large intestine lumen,YoungMaleNaproxen7,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungMaleNaproxen8,Ricciotti,ER1_Celecoxib_Naproxen,405,ER_Cele_Nap_Young,19,Large intestine lumen,YoungMaleNaproxen8,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungFemaleControl1,Ricciotti,ER1_Celecoxib_Naproxen,3578,ER_Cele_Nap_Young,20,Large intestine lumen,YoungFemaleControl1,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungFemaleControl2,Ricciotti,ER1_Celecoxib_Naproxen,3579,ER_Cele_Nap_Young,21,Large intestine lumen,YoungFemaleControl2,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungFemaleControl3,Ricciotti,ER1_Celecoxib_Naproxen,3580,ER_Cele_Nap_Young,22,Large intestine lumen,YoungFemaleControl3,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungFemaleControl4,Ricciotti,ER1_Celecoxib_Naproxen,3733,ER_Cele_Nap_Young,23,Large intestine lumen,YoungFemaleControl4,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungFemaleControl5,Ricciotti,ER1_Celecoxib_Naproxen,3734,ER_Cele_Nap_Young,24,Large intestine lumen,YoungFemaleControl5,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungFemaleControl6,Ricciotti,ER1_Celecoxib_Naproxen,3735,ER_Cele_Nap_Young,25,Large intestine lumen,YoungFemaleControl6,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungFemaleControl7,Ricciotti,ER1_Celecoxib_Naproxen,3758,ER_Cele_Nap_Young,26,Large intestine lumen,YoungFemaleControl7,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungFemaleControl8,Ricciotti,ER1_Celecoxib_Naproxen,3760,ER_Cele_Nap_Young,27,Large intestine lumen,YoungFemaleControl8,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungFemaleControl9,Ricciotti,ER1_Celecoxib_Naproxen,3710,ER_Cele_Nap_Young,28,Large intestine lumen,YoungFemaleControl9,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungFemaleControl10,Ricciotti,ER1_Celecoxib_Naproxen,3711,ER_Cele_Nap_Young,29,Large intestine lumen,YoungFemaleControl10,Mouse,21,Control,NO,05/17/24,,C57/BL6,1
+YoungFemaleCelecoxib1,Ricciotti,ER1_Celecoxib_Naproxen,3751,ER_Cele_Nap_Young,30,Large intestine lumen,YoungFemaleCelecoxib1,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungFemaleCelecoxib2,Ricciotti,ER1_Celecoxib_Naproxen,3752,ER_Cele_Nap_Young,31,Large intestine lumen,YoungFemaleCelecoxib2,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungFemaleCelecoxib3,Ricciotti,ER1_Celecoxib_Naproxen,3598,ER_Cele_Nap_Young,32,Large intestine lumen,YoungFemaleCelecoxib3,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungFemaleCelecoxib4,Ricciotti,ER1_Celecoxib_Naproxen,3599,ER_Cele_Nap_Young,33,Large intestine lumen,YoungFemaleCelecoxib4,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungFemaleCelecoxib5,Ricciotti,ER1_Celecoxib_Naproxen,3600,ER_Cele_Nap_Young,34,Large intestine lumen,YoungFemaleCelecoxib5,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungFemaleCelecoxib6,Ricciotti,ER1_Celecoxib_Naproxen,3799,ER_Cele_Nap_Young,35,Large intestine lumen,YoungFemaleCelecoxib6,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungFemaleCelecoxib7,Ricciotti,ER1_Celecoxib_Naproxen,3800,ER_Cele_Nap_Young,36,Large intestine lumen,YoungFemaleCelecoxib7,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungFemaleCelecoxib8,Ricciotti,ER1_Celecoxib_Naproxen,3801,ER_Cele_Nap_Young,37,Large intestine lumen,YoungFemaleCelecoxib8,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungFemaleCelecoxib9,Ricciotti,ER1_Celecoxib_Naproxen,3773,ER_Cele_Nap_Young,38,Large intestine lumen,YoungFemaleCelecoxib9,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungFemaleCelecoxib10,Ricciotti,ER1_Celecoxib_Naproxen,3774,ER_Cele_Nap_Young,39,Large intestine lumen,YoungFemaleCelecoxib10,Mouse,21,Celecoxib,NO,05/17/24,,C57/BL6,1
+YoungFemaleNaproxen1,Ricciotti,ER1_Celecoxib_Naproxen,3756,ER_Cele_Nap_Young,40,Large intestine lumen,YoungFemaleNaproxen1,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungFemaleNaproxen2,Ricciotti,ER1_Celecoxib_Naproxen,3757,ER_Cele_Nap_Young,41,Large intestine lumen,YoungFemaleNaproxen2,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungFemaleNaproxen3,Ricciotti,ER1_Celecoxib_Naproxen,3759,ER_Cele_Nap_Young,42,Large intestine lumen,YoungFemaleNaproxen3,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungFemaleNaproxen4,Ricciotti,ER1_Celecoxib_Naproxen,3762,ER_Cele_Nap_Young,43,Large intestine lumen,YoungFemaleNaproxen4,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungFemaleNaproxen5,Ricciotti,ER1_Celecoxib_Naproxen,3795,ER_Cele_Nap_Young,44,Large intestine lumen,YoungFemaleNaproxen5,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungFemaleNaproxen6,Ricciotti,ER1_Celecoxib_Naproxen,3726,ER_Cele_Nap_Young,45,Large intestine lumen,YoungFemaleNaproxen6,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungFemaleNaproxen7,Ricciotti,ER1_Celecoxib_Naproxen,3723,ER_Cele_Nap_Young,46,Large intestine lumen,YoungFemaleNaproxen7,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungFemaleNaproxen8,Ricciotti,ER1_Celecoxib_Naproxen,3724,ER_Cele_Nap_Young,47,Large intestine lumen,YoungFemaleNaproxen8,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungFemaleNaproxen9,Ricciotti,ER1_Celecoxib_Naproxen,3725,ER_Cele_Nap_Young,48,Large intestine lumen,YoungFemaleNaproxen9,Mouse,21,Naproxen,NO,05/17/24,,C57/BL6,1
+YoungMaleControl1f,Ricciotti,ER1_Celecoxib_Naproxen,101,ER_Cele_Nap_Young2,1,Feces,YoungMaleControl1,Mouse,21,Control,NO,05/17/24,,,
+YoungMaleControl2f,Ricciotti,ER1_Celecoxib_Naproxen,102,ER_Cele_Nap_Young3,2,Feces,YoungMaleControl2,Mouse,21,Control,NO,05/17/24,,,
+YoungMaleControl3f,Ricciotti,ER1_Celecoxib_Naproxen,202,ER_Cele_Nap_Young4,3,Feces,YoungMaleControl3,Mouse,21,Control,NO,05/17/24,,,
+YoungMaleControl4f,Ricciotti,ER1_Celecoxib_Naproxen,203,ER_Cele_Nap_Young5,4,Feces,YoungMaleControl4,Mouse,21,Control,NO,05/17/24,,,
+YoungMaleControl5f,Ricciotti,ER1_Celecoxib_Naproxen,402,ER_Cele_Nap_Young6,5,Feces,YoungMaleControl5,Mouse,21,Control,NO,05/17/24,,,
+YoungMaleCelecoxib1f,Ricciotti,ER1_Celecoxib_Naproxen,103,ER_Cele_Nap_Young7,6,Feces,YoungMaleCelecoxib1,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungMaleCelecoxib2f,Ricciotti,ER1_Celecoxib_Naproxen,104,ER_Cele_Nap_Young8,7,Feces,YoungMaleCelecoxib2,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungMaleCelecoxib3f,Ricciotti,ER1_Celecoxib_Naproxen,201,ER_Cele_Nap_Young9,8,Feces,YoungMaleCelecoxib3,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungMaleCelecoxib4f,Ricciotti,ER1_Celecoxib_Naproxen,205,ER_Cele_Nap_Young10,9,Feces,YoungMaleCelecoxib4,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungMaleCelecoxib5f,Ricciotti,ER1_Celecoxib_Naproxen,305,ER_Cele_Nap_Young11,10,Feces,YoungMaleCelecoxib5,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungMaleCelecoxib6f,Ricciotti,ER1_Celecoxib_Naproxen,401,ER_Cele_Nap_Young12,11,Feces,YoungMaleCelecoxib6,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungMaleNaproxen1f,Ricciotti,ER1_Celecoxib_Naproxen,105,ER_Cele_Nap_Young13,12,Feces,YoungMaleNaproxen1,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungMaleNaproxen2f,Ricciotti,ER1_Celecoxib_Naproxen,204,ER_Cele_Nap_Young14,13,Feces,YoungMaleNaproxen2,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungMaleNaproxen3f,Ricciotti,ER1_Celecoxib_Naproxen,301,ER_Cele_Nap_Young15,14,Feces,YoungMaleNaproxen3,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungMaleNaproxen4f,Ricciotti,ER1_Celecoxib_Naproxen,302,ER_Cele_Nap_Young16,15,Feces,YoungMaleNaproxen4,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungMaleNaproxen5f,Ricciotti,ER1_Celecoxib_Naproxen,303,ER_Cele_Nap_Young17,16,Feces,YoungMaleNaproxen5,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungMaleNaproxen6f,Ricciotti,ER1_Celecoxib_Naproxen,304,ER_Cele_Nap_Young18,17,Feces,YoungMaleNaproxen6,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungMaleNaproxen7f,Ricciotti,ER1_Celecoxib_Naproxen,404,ER_Cele_Nap_Young19,18,Feces,YoungMaleNaproxen7,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungMaleNaproxen8f,Ricciotti,ER1_Celecoxib_Naproxen,405,ER_Cele_Nap_Young20,19,Feces,YoungMaleNaproxen8,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungFemaleControl1f,Ricciotti,ER1_Celecoxib_Naproxen,3578,ER_Cele_Nap_Young21,20,Feces,YoungFemaleControl1,Mouse,21,Control,NO,05/17/24,,,
+YoungFemaleControl2f,Ricciotti,ER1_Celecoxib_Naproxen,3579,ER_Cele_Nap_Young22,21,Feces,YoungFemaleControl2,Mouse,21,Control,NO,05/17/24,,,
+YoungFemaleControl3f,Ricciotti,ER1_Celecoxib_Naproxen,3580,ER_Cele_Nap_Young23,22,Feces,YoungFemaleControl3,Mouse,21,Control,NO,05/17/24,,,
+YoungFemaleControl4f,Ricciotti,ER1_Celecoxib_Naproxen,3733,ER_Cele_Nap_Young24,23,Feces,YoungFemaleControl4,Mouse,21,Control,NO,05/17/24,,,
+YoungFemaleControl5f,Ricciotti,ER1_Celecoxib_Naproxen,3734,ER_Cele_Nap_Young25,24,Feces,YoungFemaleControl5,Mouse,21,Control,NO,05/17/24,,,
+YoungFemaleControl6f,Ricciotti,ER1_Celecoxib_Naproxen,3735,ER_Cele_Nap_Young26,25,Feces,YoungFemaleControl6,Mouse,21,Control,NO,05/17/24,,,
+YoungFemaleControl7f,Ricciotti,ER1_Celecoxib_Naproxen,3758,ER_Cele_Nap_Young27,26,Feces,YoungFemaleControl7,Mouse,21,Control,NO,05/17/24,,,
+YoungFemaleControl8f,Ricciotti,ER1_Celecoxib_Naproxen,3760,ER_Cele_Nap_Young28,27,Feces,YoungFemaleControl8,Mouse,21,Control,NO,05/17/24,,,
+YoungFemaleControl9f,Ricciotti,ER1_Celecoxib_Naproxen,3710,ER_Cele_Nap_Young29,28,Feces,YoungFemaleControl9,Mouse,21,Control,NO,05/17/24,,,
+YoungFemaleControl10f,Ricciotti,ER1_Celecoxib_Naproxen,3711,ER_Cele_Nap_Young30,29,Feces,YoungFemaleControl10,Mouse,21,Control,NO,05/17/24,,,
+YoungFemaleCelecoxib1f,Ricciotti,ER1_Celecoxib_Naproxen,3751,ER_Cele_Nap_Young31,30,Feces,YoungFemaleCelecoxib1,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungFemaleCelecoxib2f,Ricciotti,ER1_Celecoxib_Naproxen,3752,ER_Cele_Nap_Young32,31,Feces,YoungFemaleCelecoxib2,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungFemaleCelecoxib3f,Ricciotti,ER1_Celecoxib_Naproxen,3598,ER_Cele_Nap_Young33,32,Feces,YoungFemaleCelecoxib3,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungFemaleCelecoxib4f,Ricciotti,ER1_Celecoxib_Naproxen,3599,ER_Cele_Nap_Young34,33,Feces,YoungFemaleCelecoxib4,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungFemaleCelecoxib5f,Ricciotti,ER1_Celecoxib_Naproxen,3600,ER_Cele_Nap_Young35,34,Feces,YoungFemaleCelecoxib5,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungFemaleCelecoxib6f,Ricciotti,ER1_Celecoxib_Naproxen,3799,ER_Cele_Nap_Young36,35,Feces,YoungFemaleCelecoxib6,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungFemaleCelecoxib7f,Ricciotti,ER1_Celecoxib_Naproxen,3800,ER_Cele_Nap_Young37,36,Feces,YoungFemaleCelecoxib7,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungFemaleCelecoxib8f,Ricciotti,ER1_Celecoxib_Naproxen,3801,ER_Cele_Nap_Young38,37,Feces,YoungFemaleCelecoxib8,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungFemaleCelecoxib9f,Ricciotti,ER1_Celecoxib_Naproxen,3773,ER_Cele_Nap_Young39,38,Feces,YoungFemaleCelecoxib9,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungFemaleCelecoxib10f,Ricciotti,ER1_Celecoxib_Naproxen,3774,ER_Cele_Nap_Young40,39,Feces,YoungFemaleCelecoxib10,Mouse,21,Celecoxib,NO,05/17/24,,,
+YoungFemaleNaproxen1f,Ricciotti,ER1_Celecoxib_Naproxen,3756,ER_Cele_Nap_Young41,40,Feces,YoungFemaleNaproxen1,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungFemaleNaproxen2f,Ricciotti,ER1_Celecoxib_Naproxen,3757,ER_Cele_Nap_Young42,41,Feces,YoungFemaleNaproxen2,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungFemaleNaproxen3f,Ricciotti,ER1_Celecoxib_Naproxen,3759,ER_Cele_Nap_Young43,42,Feces,YoungFemaleNaproxen3,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungFemaleNaproxen4f,Ricciotti,ER1_Celecoxib_Naproxen,3762,ER_Cele_Nap_Young44,43,Feces,YoungFemaleNaproxen4,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungFemaleNaproxen5f,Ricciotti,ER1_Celecoxib_Naproxen,3795,ER_Cele_Nap_Young45,44,Feces,YoungFemaleNaproxen5,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungFemaleNaproxen6f,Ricciotti,ER1_Celecoxib_Naproxen,3726,ER_Cele_Nap_Young46,45,Feces,YoungFemaleNaproxen6,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungFemaleNaproxen7f,Ricciotti,ER1_Celecoxib_Naproxen,3723,ER_Cele_Nap_Young47,46,Feces,YoungFemaleNaproxen7,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungFemaleNaproxen8f,Ricciotti,ER1_Celecoxib_Naproxen,3724,ER_Cele_Nap_Young48,47,Feces,YoungFemaleNaproxen8,Mouse,21,Naproxen,NO,05/17/24,,,
+YoungFemaleNaproxen9f,Ricciotti,ER1_Celecoxib_Naproxen,3725,ER_Cele_Nap_Young49,48,Feces,YoungFemaleNaproxen9,Mouse,21,Naproxen,NO,05/17/24,,,
