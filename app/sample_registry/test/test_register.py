@@ -2,7 +2,6 @@ import gzip
 import io
 import os
 import pytest
-import shutil
 import tempfile
 from sqlalchemy import and_, create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
@@ -224,7 +223,6 @@ def test_register_annotations(db, temp_sample_file, temp_modified_sample_file):
 
 def test_unregister_samples(db, temp_sample_file):
     register_run(run_args, db)
-    out = io.StringIO()
     sample_file = temp_sample_file
     args = ["3", sample_file.name]
     register_sample_annotations(args, True, db)

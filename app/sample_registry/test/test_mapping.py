@@ -62,4 +62,4 @@ def test_look_up_nextera_barcodes():
     t = SampleTable.load(input_file)
     t.look_up_nextera_barcodes()
     assert t.recs[1]["BarcodeSequence"] == "ACTCGCTA-TATCCTCT"
-    assert t.validate() == None
+    assert t.validate() is None
