@@ -57,7 +57,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ctbushman/metadata_checker
+          images: ctbushman/sample_registry
       
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
