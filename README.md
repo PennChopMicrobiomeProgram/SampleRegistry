@@ -32,3 +32,9 @@ When running, it will default to using a SQLite3 database located in the root of
 ## Using the library
 
 The `sample_registry` library can be installed and run anywhere by following the instructions in Development (you don't need to do the `create_test_db` and running the site (bottom two commands)). To connect it to a Postgres backend, you'll need to also set the environment variables `DB_HOST`, `DB_USER`, `DB_NAME`, and `DB_PSWD`.
+
+## Manually build Docker image
+
+If you want to iterate over a feature you can only test on the K8s deployment, you can manually build the Docker image instead of relying on the release workflow. Use `docker build -t ctbushman/sample_registry:latest -f Dockerfile .` to build the image and then `docker push ctbushman/sample_registry:latest` to push it to DockerHub. You can then trigger the K8s deployment to grab the new image.
+
+N.B. You might want to use a different tag than `latest` if you're testing something volatile so that if someone else is trying to use the image as you're developing, they won't pull your wonky changes.

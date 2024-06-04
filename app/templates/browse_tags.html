@@ -19,8 +19,12 @@
     <h3>Other sample annotations</h3>
     
     <p class="tagcloud">
-        {% for tag in tags %}
-        <a href="{{ url_for('show_tags', tag=tag[0]) }}" style="font-size: {{ 10 + 90 * (tag[1] / maxcnt) }}px">{{ tag[0] }}</a> 
-        {% endfor %}
+        {% if tags|length == 0 %}
+            <p>No tags found.</p>
+        {% else %}
+            {% for tag in tags %}
+            <a href="{{ url_for('show_tags', tag=tag[0]) }}" style="font-size: {{ 10 + 90 * (tag[1] / maxcnt) }}px">{{ tag[0] }}</a> 
+            {% endfor %}
+        {% endif %}
     </p>
 {% endblock %}
