@@ -43,7 +43,7 @@ class SampleRegistry(object):
         data_uri: str,
         comment: str,
     ) -> int:
-        run_acc = self.session.scalar(
+        return self.session.scalar(
             insert(Run)
             .returning(Run.run_accession)
             .values(
@@ -57,9 +57,6 @@ class SampleRegistry(object):
                 }
             )
         )
-
-        self.session.commit()
-        return run_acc
 
     def register_samples(
         self, run_accession: int, sample_table: SampleTable
@@ -79,7 +76,7 @@ class SampleRegistry(object):
         ).first():
             raise ValueError("Samples already registered for run %s" % run_accession)
 
-        sample_accs = self.session.scalars(
+        return self.session.scalars(
             insert(Sample)
             .returning(Sample.sample_accession)
             .values(
@@ -94,9 +91,6 @@ class SampleRegistry(object):
             )
         )
 
-        self.session.commit()
-        return sample_accs
-
     def remove_samples(self, run_accession: int) -> list[int]:
         samples = self.session.scalars(
             select(Sample.sample_accession).where(Sample.run_accession == run_accession)
@@ -108,7 +102,6 @@ class SampleRegistry(object):
             delete(Sample).where(Sample.run_accession == run_accession)
         )
 
-        self.session.commit()
         return samples
 
     def register_annotations(self, run_accession: int, sample_table: SampleTable):
@@ -152,7 +145,6 @@ class SampleRegistry(object):
                 )
             )
 
-        self.session.commit()
         return annotation_keys
 
     def _get_sample_accessions(
@@ -182,7 +174,6 @@ class SampleRegistry(object):
 
     def remove_standard_sample_types(self):
         self.session.execute(delete(StandardSampleType))
-        self.session.commit()
 
     def register_standard_sample_types(self, sample_types: list[tuple[str, str, bool]]):
         self.session.execute(
@@ -198,11 +189,8 @@ class SampleRegistry(object):
             )
         )
 
-        self.session.commit()
-
     def remove_standard_host_species(self):
         self.session.execute(delete(StandardHostSpecies))
-        self.session.commit()
 
     def register_standard_host_species(
         self, host_species
@@ -219,5 +207,3 @@ class SampleRegistry(object):
                 ]
             )
         )
-
-        self.session.commit()
