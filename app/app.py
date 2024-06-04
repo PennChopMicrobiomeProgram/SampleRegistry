@@ -121,9 +121,8 @@ def show_tags(tag=None, val=None):
             .group_by(Annotation.key)
             .all()
         )
-        return render_template(
-            "browse_tags.html", tags=tags, maxcnt=max([t[1] for t in tags])
-        )
+        maxcnt = max([t[1] for t in tags]) if tags else 0
+        return render_template("browse_tags.html", tags=tags, maxcnt=maxcnt)
 
 
 @app.route("/runs")

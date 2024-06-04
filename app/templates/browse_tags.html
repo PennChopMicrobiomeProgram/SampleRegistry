@@ -19,7 +19,7 @@
     <h3>Other sample annotations</h3>
     
     <p class="tagcloud">
-        {% if tags|length == 0 %}
+        {% if maxcnt == 0 %}
             <p>No tags found.</p>
         {% else %}
             {% for tag in tags %}
