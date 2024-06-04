@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
 
 {% block body %}
+{% if num_samples != 0 %}
 <p>Every sample should have a SampleType: {{ num_samples_with_sampletype }} of {{ num_samples }} ({{ "%.2f"|format(100 * num_samples_with_sampletype / num_samples) }}%).</p>
+{% endif %}
 
+{% if num_samples_with_sampletype != 0 %}
 <p>All SampleType values should be in the approved list: {{ num_samples_with_standard_sampletype }} of {{ num_samples_with_sampletype }} ({{ "%.2f"|format(100 * num_samples_with_standard_sampletype / num_samples_with_sampletype) }}%).</p>
+{% endif %}
 
 Standard sample types:
 <table>
@@ -21,9 +25,13 @@ Nonstandard sample types:
 {% endfor %}
 </table>
 
+{% if num_subjectid != 0 %}
 <p>If SubjectID tag is filled in, HostSpecies tag should also be filled in: {{ num_subjectid_with_hostspecies }} of {{ num_subjectid }} ({{ "%.2f"|format(100 * num_subjectid_with_hostspecies / num_subjectid) }}%).</p>
+{% endif %}
 
+{% if num_samples_with_hostspecies != 0 %}
 <p>All HostSpecies values should be in the approved list: {{ num_samples_with_standard_hostspecies }} of {{ num_samples_with_hostspecies }} ({{ "%.2f"|format(100 * num_samples_with_standard_hostspecies / num_samples_with_hostspecies) }}%).</p>
+{% endif %}
 
 Standard host species:
 <table>

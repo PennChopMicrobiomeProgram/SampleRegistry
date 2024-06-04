@@ -46,6 +46,8 @@ def unregister_samples(argv=None, session: Session = None, out=sys.stdout):
     samples_removed = registry.remove_samples(args.run_accession)
     out.write("Removed {0} samples: {1}".format(len(samples_removed), samples_removed))
 
+    session.commit()
+
 
 def register_samples():
     return register_sample_annotations(None, True)
@@ -78,6 +80,8 @@ def register_sample_annotations(
         registry.register_samples(args.run_accession, sample_table)
     registry.register_annotations(args.run_accession, sample_table)
 
+    session.commit()
+
 
 def parse_tsv_ncol(f, ncol: int) -> Generator[tuple[str], None, None]:
     assert ncol > 0
@@ -107,6 +111,8 @@ def register_sample_types(argv=None, session: Session = None):
     registry.remove_standard_sample_types()
     registry.register_standard_sample_types(sample_types)
 
+    session.commit()
+
 
 def register_host_species(argv=None, session: Session = None):
     p = argparse.ArgumentParser(
@@ -119,6 +125,8 @@ def register_host_species(argv=None, session: Session = None):
     host_species = list(parse_tsv_ncol(args.file, 3))
     registry.remove_standard_host_species()
     registry.register_standard_host_species(host_species)
+
+    session.commit()
 
 
 def register_illumina_file(argv=None, session: Session = None, out=sys.stdout):
@@ -135,6 +143,8 @@ def register_illumina_file(argv=None, session: Session = None, out=sys.stdout):
         f.date, f.machine_type, "Nextera XT", f.lane, f.filepath, args.comment
     )
     out.write("Registered run {0} in the database\n".format(acc))
+
+    session.commit()
 
 
 def register_run(argv=None, session: Session = None, out=sys.stdout):
@@ -156,3 +166,5 @@ def register_run(argv=None, session: Session = None, out=sys.stdout):
         args.date, args.type, "Nextera XT", args.lane, args.file, args.comment
     )
     out.write("Registered run %s in the database\n" % acc)
+
+    session.commit()
