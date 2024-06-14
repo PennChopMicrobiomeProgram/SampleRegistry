@@ -69,7 +69,8 @@ class SampleRegistry(object):
             select(Sample).where(Sample.run_accession == run_accession)
         ).all()
         if bool(samples) != exists:
-            raise ValueError("No samples for run %s" % run_accession)
+            s = "exist" if exists else "don't exist"
+            raise ValueError(f"Samples {s} for run {run_accession}")
         return samples
 
     def register_samples(

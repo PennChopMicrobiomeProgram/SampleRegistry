@@ -85,6 +85,12 @@ def test_check_samples(db):
     assert len(registry.check_samples(1)) == 2
 
 
+def test_check_samples_exist(db):
+    registry = SampleRegistry(db)
+    with pytest.raises(ValueError):
+        registry.check_samples(1, exists=False)
+
+
 def test_check_samples_doesnt_exist(db):
     registry = SampleRegistry(db)
     with pytest.raises(ValueError):
