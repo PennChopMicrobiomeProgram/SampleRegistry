@@ -175,7 +175,9 @@ class SampleRegistry(object):
     def remove_standard_sample_types(self):
         self.session.execute(delete(StandardSampleType))
 
-    def register_standard_sample_types(self, sample_types: list[tuple[str, str, bool]]):
+    def register_standard_sample_types(
+        self, sample_types: list[tuple[str, str, bool, str]]
+    ):
         self.session.execute(
             insert(StandardSampleType).values(
                 [
@@ -183,8 +185,9 @@ class SampleRegistry(object):
                         "sample_type": sample_type,
                         "rarity": rarity,
                         "host_associated": bool(host_associated),
+                        "comment": comment,
                     }
-                    for sample_type, rarity, host_associated in sample_types
+                    for sample_type, rarity, host_associated, comment in sample_types
                 ]
             )
         )

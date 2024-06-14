@@ -107,7 +107,7 @@ def register_sample_types(argv=None, session: Session = None):
     args = p.parse_args(argv)
 
     registry = SampleRegistry(session)
-    sample_types = list(parse_tsv_ncol(args.file, 3))
+    sample_types = list(parse_tsv_ncol(args.file, 4))
     registry.remove_standard_sample_types()
     registry.register_standard_sample_types(sample_types)
 
