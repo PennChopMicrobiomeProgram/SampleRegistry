@@ -64,6 +64,14 @@ class SampleRegistry(object):
             update(Run).where(Run.run_accession == run_accession).values(**kwargs)
         )
 
+    def check_samples(self, run_accession: int, exists: bool = True) -> list[Sample]:
+        samples = self.session.scalars(
+            select(Sample).where(Sample.run_accession == run_accession)
+        ).all()
+        if bool(samples) != exists:
+            raise ValueError("No samples for run %s" % run_accession)
+        return samples
+
     def register_samples(
         self, run_accession: int, sample_table: SampleTable
     ) -> list[int]:
@@ -103,18 +111,6 @@ class SampleRegistry(object):
             update(Sample)
             .where(Sample.sample_accession == sample_accession)
             .values(**kwargs)
-        )
-
-    def modify_annotation(self, sample_accession: int, key: str, val: str):
-        self.session.execute(
-            update(Annotation)
-            .where(
-                and_(
-                    Annotation.sample_accession == sample_accession,
-                    Annotation.key == key,
-                )
-            )
-            .values({"val": val})
         )
 
     def remove_samples(self, run_accession: int) -> list[int]:
@@ -197,6 +193,18 @@ class SampleRegistry(object):
         if unaccessioned_recs:
             raise IOError("Not accessioned: %s" % unaccessioned_recs)
         return accessions
+
+    def modify_annotation(self, sample_accession: int, key: str, val: str):
+        self.session.execute(
+            update(Annotation)
+            .where(
+                and_(
+                    Annotation.sample_accession == sample_accession,
+                    Annotation.key == key,
+                )
+            )
+            .values({"val": val})
+        )
 
     def remove_standard_sample_types(self):
         self.session.execute(delete(StandardSampleType))

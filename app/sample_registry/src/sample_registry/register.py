@@ -50,6 +50,7 @@ def unregister_samples(argv=None, session: Session = None, out=sys.stdout):
 
 
 def register_samples():
+
     return register_sample_annotations(None, True)
 
 
@@ -70,11 +71,15 @@ def register_sample_annotations(
     p.add_argument("sample_table", type=argparse.FileType("r"), help=SAMPLE_TABLE_HELP)
     args = p.parse_args(argv)
 
+    registry = SampleRegistry(session)
+
+    if register_samples:
+        registry.check_samples(args.run_accession, exists=False)
+
     sample_table = SampleTable.load(args.sample_table)
     sample_table.look_up_nextera_barcodes()
     sample_table.validate()
 
-    registry = SampleRegistry(session)
     registry.check_run_accession(args.run_accession)
     if register_samples:
         registry.register_samples(args.run_accession, sample_table)

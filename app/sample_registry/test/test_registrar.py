@@ -80,6 +80,17 @@ def test_modify_run(db):
     assert db.scalar(select(Run).where(Run.run_accession == 1)).run_date == "12/12/12"
 
 
+def test_check_samples(db):
+    registry = SampleRegistry(db)
+    assert len(registry.check_samples(1)) == 2
+
+
+def test_check_samples_doesnt_exist(db):
+    registry = SampleRegistry(db)
+    with pytest.raises(ValueError):
+        registry.check_samples(9999)
+
+
 def test_register_samples(db):
     registry = SampleRegistry(db)
     sample_table = SampleTable(recs)
