@@ -121,7 +121,7 @@ def test_register_annotations(db):
 
 def test_register_standard_sample_types(db):
     registry = SampleRegistry(db)
-    registry.register_standard_sample_types([("type1", "common", False)])
+    registry.register_standard_sample_types([("type1", "common", False, "NA")])
     assert db.scalar(
         select(StandardSampleType).where(StandardSampleType.sample_type == "type1")
     )

@@ -249,7 +249,7 @@ def test_register_sample_types(db):
     ]
 
     # Add a new sample type and re-register
-    new_line = "Extra type	1	Just to test"
+    new_line = "Extra type\tCommon\t1\tJust to test"
     f2 = tempfile.NamedTemporaryFile("wt")
     f2.write(SAMPLE_TYPES_TSV + new_line)
     f2.seek(0)
@@ -277,7 +277,7 @@ def test_register_host_species(db):
     ]
 
     # Add a new host species and re-register
-    new_line = "Dog	Canis lupus	9615"
+    new_line = "Dog\tCanis lupus\t9615"
     f2 = tempfile.NamedTemporaryFile("wt")
     f2.write(HOST_SPECIES_TSV + new_line)
     f2.seek(0)
@@ -291,20 +291,20 @@ def test_register_host_species(db):
 
 
 SAMPLE_TYPES_TSV = """\
-sample_type	host_associated	description
+sample_type\trarity\thost_associated\tdescription
 
 # Gut
-Feces	1	Human and animal fecal material.
-Rectal swab	1	Results are sensitive to collection method.
-Ostomy fluid	1	
-Colonic biopsy	1	
+Feces\tCommon\t1\tHuman and animal fecal material.\tNA
+Rectal swab\tCommon\t1\tResults are sensitive to collection method.\tNA
+Ostomy fluid\tCommon\t1\tNA
+Colonic biopsy\tCommon\t1\tNA
 
 # Oral
-Oral wash	1	
+Oral wash\tCommon\t1\tNA
 """
 
 HOST_SPECIES_TSV = """\
-host_species	scientific_name	ncbi_taxid
-Human	Homo sapiens	9606
-Mouse	Mus musculus	10090
+host_species\tscientific_name\tncbi_taxid
+Human\tHomo sapiens\t9606
+Mouse\tMus musculus\t10090
 """
