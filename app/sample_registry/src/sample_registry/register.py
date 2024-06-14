@@ -44,9 +44,9 @@ def unregister_samples(argv=None, session: Session = None, out=sys.stdout):
     registry = SampleRegistry(session)
     registry.check_run_accession(args.run_accession)
     samples_removed = registry.remove_samples(args.run_accession)
-    out.write("Removed {0} samples: {1}".format(len(samples_removed), samples_removed))
 
-    session.commit()
+    registry.session.commit()
+    out.write("Removed {0} samples: {1}".format(len(samples_removed), samples_removed))
 
 
 def register_samples():
@@ -80,7 +80,7 @@ def register_sample_annotations(
         registry.register_samples(args.run_accession, sample_table)
     registry.register_annotations(args.run_accession, sample_table)
 
-    session.commit()
+    registry.session.commit()
 
 
 def parse_tsv_ncol(f, ncol: int) -> Generator[tuple[str], None, None]:
@@ -111,7 +111,7 @@ def register_sample_types(argv=None, session: Session = None):
     registry.remove_standard_sample_types()
     registry.register_standard_sample_types(sample_types)
 
-    session.commit()
+    registry.session.commit()
 
 
 def register_host_species(argv=None, session: Session = None):
@@ -126,7 +126,7 @@ def register_host_species(argv=None, session: Session = None):
     registry.remove_standard_host_species()
     registry.register_standard_host_species(host_species)
 
-    session.commit()
+    registry.session.commit()
 
 
 def register_illumina_file(argv=None, session: Session = None, out=sys.stdout):
@@ -142,9 +142,9 @@ def register_illumina_file(argv=None, session: Session = None, out=sys.stdout):
     acc = registry.register_run(
         f.date, f.machine_type, "Nextera XT", f.lane, f.filepath, args.comment
     )
-    out.write("Registered run {0} in the database\n".format(acc))
 
-    session.commit()
+    registry.session.commit()
+    out.write("Registered run {0} in the database\n".format(acc))
 
 
 def register_run(argv=None, session: Session = None, out=sys.stdout):
@@ -165,6 +165,6 @@ def register_run(argv=None, session: Session = None, out=sys.stdout):
     acc = registry.register_run(
         args.date, args.type, "Nextera XT", args.lane, args.file, args.comment
     )
-    out.write("Registered run %s in the database\n" % acc)
 
-    session.commit()
+    registry.session.commit()
+    out.write("Registered run %s in the database\n" % acc)

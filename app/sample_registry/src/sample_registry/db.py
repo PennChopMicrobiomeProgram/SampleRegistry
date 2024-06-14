@@ -61,7 +61,7 @@ def create_test_db(session: sessionmaker = None):
         run_accession=run1.run_accession,
         barcode_sequence="AAAA",
         primer_sequence="TTTT",
-        sample_type="Stool",
+        sample_type="BAL",
         subject_id="Subject1",
         host_species="Human",
     )
@@ -71,7 +71,7 @@ def create_test_db(session: sessionmaker = None):
         run_accession=run1.run_accession,
         barcode_sequence="CCCC",
         primer_sequence="GGGG",
-        sample_type="Stool",
+        sample_type="Cecum",
         subject_id="Subject2",
         host_species="Human",
     )
@@ -81,7 +81,7 @@ def create_test_db(session: sessionmaker = None):
         run_accession=run2.run_accession,
         barcode_sequence="GGGG",
         primer_sequence="CCCC",
-        sample_type="Stool",
+        sample_type="Whole gut",
         subject_id="Subject3",
         host_species="Human",
     )
@@ -91,7 +91,7 @@ def create_test_db(session: sessionmaker = None):
         run_accession=run2.run_accession,
         barcode_sequence="TTTT",
         primer_sequence="AAAA",
-        sample_type="Stool",
+        sample_type="Urine",
         subject_id="Subject4",
         host_species="Human",
     )

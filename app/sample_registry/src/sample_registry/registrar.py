@@ -28,9 +28,6 @@ class SampleRegistry(object):
 
             self.session = imported_session
 
-        if not session:
-            raise ValueError("No session provided")
-
     def check_run_accession(self, acc: int) -> Run:
         run = self.session.scalar(select(Run).where(Run.run_accession == acc))
         if not run:
