@@ -190,6 +190,10 @@ def test_register_samples(db, temp_sample_file):
         == "asdf"
     )
 
+    # Check that registering the samples again throws an error
+    with pytest.raises(ValueError):
+        register_sample_annotations(args, True, db)
+
 
 def test_register_annotations(db, temp_sample_file, temp_modified_sample_file):
     register_run(run_args, db)
