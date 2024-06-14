@@ -168,3 +168,79 @@ def register_run(argv=None, session: Session = None, out=sys.stdout):
 
     registry.session.commit()
     out.write("Registered run %s in the database\n" % acc)
+
+
+def modify_run(argv=None, session: Session = None):
+    p = argparse.ArgumentParser(description="Modify an existing run in the registry")
+    p.add_argument("run_accession", type=int, help="Run accession number")
+    p.add_argument("--date", help="Run date (YYYY-MM-DD)")
+    p.add_argument("--comment", help="Comment (free text)")
+    p.add_argument(
+        "--type",
+        choices=SampleRegistry.machines,
+        help="Machine type",
+    )
+    p.add_argument("--kit", help="Machine kit")
+    p.add_argument("--lane", type=int, help="Lane number")
+    p.add_argument("--data_uri", help="Data URI")
+    p.add_argument("--admin_comment", help="Admin comment")
+    args = p.parse_args(argv)
+
+    registry = SampleRegistry(session)
+    registry.check_run_accession(args.run_accession)
+    registry.modify_run(
+        run_accession=args.run_accession,
+        run_date=args.date,
+        machine_type=args.type,
+        machine_kit=args.kit,
+        lane=args.lane,
+        data_uri=args.data_uri,
+        comment=args.comment,
+        admin_comment=args.admin_comment,
+    )
+
+    registry.session.commit()
+
+
+def modify_sample(argv=None, session: Session = None):
+    p = argparse.ArgumentParser(description="Modify an existing sample in the registry")
+    p.add_argument("sample_accession", type=int, help="Sample accession number")
+    p.add_argument("--sample_name", help="Sample name")
+    p.add_argument("--sample_type", help="Sample type")
+    p.add_argument("--subject_id", help="Subject ID")
+    p.add_argument("--host_species", help="Host species")
+    p.add_argument("--barcode_sequence", help="Barcode sequence")
+    p.add_argument("--primer_sequence", help="Primer sequence")
+    args = p.parse_args(argv)
+
+    registry = SampleRegistry(session)
+    registry.check_sample_accession(args.sample_accession)
+    registry.modify_sample(
+        sample_accession=args.sample_accession,
+        sample_name=args.sample_name,
+        sample_type=args.sample_type,
+        subject_id=args.subject_id,
+        host_species=args.host_species,
+        barcode_sequence=args.barcode_sequence,
+        primer_sequence=args.primer_sequence,
+    )
+
+    registry.session.commit()
+
+
+def modify_annotation(argv=None, session: Session = None):
+    p = argparse.ArgumentParser(
+        description="Modify an existing annotation in the registry"
+    )
+    p.add_argument("sample_accession", type=int, help="Sample accession number")
+    p.add_argument("key", help="Annotation key")
+    p.add_argument("val", help="Annotation value")
+    args = p.parse_args(argv)
+
+    registry = SampleRegistry(session)
+    registry.check_sample_accession(args.sample_accession)
+    registry.modify_annotation(
+        sample_accession=args.sample_accession, key=args.key, val=args.val
+    )
+
+    registry.session.commit()

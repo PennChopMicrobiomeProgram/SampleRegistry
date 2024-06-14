@@ -7,6 +7,7 @@ from src.sample_registry.mapping import SampleTable
 from src.sample_registry.models import (
     Annotation,
     Base,
+    Run,
     Sample,
     StandardHostSpecies,
     StandardSampleType,
@@ -73,6 +74,12 @@ def test_register_run(db):
     )
 
 
+def test_modify_run(db):
+    registry = SampleRegistry(db)
+    registry.modify_run(1, run_date="12/12/12", machine_type="Illumina-MiSeq")
+    assert db.scalar(select(Run).where(Run.run_accession == 1)).run_date == "12/12/12"
+
+
 def test_register_samples(db):
     registry = SampleRegistry(db)
     sample_table = SampleTable(recs)
@@ -83,6 +90,16 @@ def test_register_samples(db):
             select(func.count(Sample.sample_accession)).where(Sample.run_accession == 3)
         )
         == 2
+    )
+
+
+def test_modify_samples(db):
+    registry = SampleRegistry(db)
+    registry.modify_sample(1, sample_name="New name")
+
+    assert (
+        db.scalar(select(Sample).where(Sample.sample_accession == 1)).sample_name
+        == "New name"
     )
 
 
@@ -116,6 +133,19 @@ def test_register_annotations(db):
             )
         )
         == 2
+    )
+
+
+def test_modify_annotation(db):
+    registry = SampleRegistry(db)
+    registry.modify_annotation(1, "key0", "new val")
+    assert (
+        db.scalar(
+            select(Annotation).where(
+                Annotation.sample_accession == 1, Annotation.key == "key0"
+            )
+        ).val
+        == "new val"
     )
 
 

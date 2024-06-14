@@ -141,10 +141,13 @@ test = ["pytest", "pytest-cov"]
 # which executes the function `main` from this package when invoked.
 [project.scripts]  # Optional
 register_run = "sample_registry.register:register_run"
+modify_run = "sample_registry.register:modify_run"
 register_run_file = "sample_registry.register:register_illumina_file"
 unregister_samples = "sample_registry.register:unregister_samples"
 register_samples = "sample_registry.register:register_samples"
+modify_sample = "sample_registry.register:modify_sample"
 register_annotations = "sample_registry.register:register_annotations"
+modify_annotation = "sample_registry.register:modify_annotation"
 register_host_species = "sample_registry.register:register_host_species"
 register_sample_types = "sample_registry.register:register_sample_types"
 export_samples = "sample_registry.export:export_samples"

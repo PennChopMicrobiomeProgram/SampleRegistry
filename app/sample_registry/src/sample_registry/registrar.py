@@ -58,6 +58,12 @@ class SampleRegistry(object):
             )
         )
 
+    def modify_run(self, run_accession: int, **kwargs):
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
+        self.session.execute(
+            update(Run).where(Run.run_accession == run_accession).values(**kwargs)
+        )
+
     def register_samples(
         self, run_accession: int, sample_table: SampleTable
     ) -> list[int]:
@@ -89,6 +95,26 @@ class SampleRegistry(object):
                     for sample_name, barcode_sequence in sample_table.core_info
                 ]
             )
+        )
+
+    def modify_sample(self, sample_accession: int, **kwargs):
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
+        self.session.execute(
+            update(Sample)
+            .where(Sample.sample_accession == sample_accession)
+            .values(**kwargs)
+        )
+
+    def modify_annotation(self, sample_accession: int, key: str, val: str):
+        self.session.execute(
+            update(Annotation)
+            .where(
+                and_(
+                    Annotation.sample_accession == sample_accession,
+                    Annotation.key == key,
+                )
+            )
+            .values({"val": val})
         )
 
     def remove_samples(self, run_accession: int) -> list[int]:
