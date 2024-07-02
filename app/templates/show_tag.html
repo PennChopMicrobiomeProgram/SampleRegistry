@@ -35,7 +35,11 @@
   $(document).ready(function () {
       /* Set up data table */
       $('#tagstats').dataTable({
-          "bPaginate": false,
+          "bSort": false,
+          "iDisplayLength": 20,
+          "bLengthChange": false,
+          "sPaginationType": "full_numbers",
+          "bStateSave": true,
       });
   
       /* Move search box to bottom of summary area */
