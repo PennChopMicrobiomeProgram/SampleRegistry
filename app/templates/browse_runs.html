@@ -19,7 +19,7 @@
       </tr>
     </thead>
     <tbody>
-  {% for run in runs %}
+  {% for run, sample_count in sample_counts.items() %}
       {% if run.machine_type.startswith('Illumina') %}
           {% set platform = 'Illumina' %}
       {% else %}
@@ -31,7 +31,7 @@
         <td><span class="date">{{ run.run_date }}</span></td>
         <td><nobr>{{ platform }}</nobr></td>
         <td>{{ run.lane }}</td>
-        <td>{{ 1 }}</td>
+        <td>{{ sample_count }}</td>
         <td>{{ run.comment }}</td>
       </tr>
   {% endfor %}

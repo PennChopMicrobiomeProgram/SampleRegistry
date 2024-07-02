@@ -172,12 +172,12 @@ def show_runs(run_acc=None):
     else:
         runs = db.session.query(Run).all()[::-1]
         sample_counts = {
-            r: db.session.query(Sample)
-            .filter(Sample.run_accession == r.run_accession)
+            run: db.session.query(Sample)
+            .filter(Sample.run_accession == run.run_accession)
             .count()
-            for r in runs
+            for run in runs
         }
-        return render_template("browse_runs.html", runs=runs)
+        return render_template("browse_runs.html", sample_counts=sample_counts)
 
 
 @app.route("/stats")
@@ -199,7 +199,10 @@ def show_stats():
         )
         .join(Sample, Sample.sample_type == StandardSampleType.sample_type)
         .group_by(StandardSampleType.sample_type)
-        .order_by(db.func.count(Sample.sample_accession).desc())
+        .order_by(
+            db.func.count(Sample.sample_accession).desc(),
+            StandardSampleType.sample_type,
+        )
         .all()
     )
     standard_sampletypes = set(
@@ -208,7 +211,8 @@ def show_stats():
     nonstandard_sampletype_counts = (
         db.session.query(Sample.sample_type, db.func.count(Sample.sample_accession))
         .filter(Sample.sample_type.notin_(standard_sampletypes))
-        .order_by(db.func.count(Sample.sample_accession).desc())
+        .group_by(Sample.sample_type)
+        .order_by(db.func.count(Sample.sample_accession).desc(), Sample.sample_type)
     )
 
     num_subjectid = (
@@ -240,7 +244,10 @@ def show_stats():
         )
         .join(Sample, Sample.host_species == StandardHostSpecies.host_species)
         .group_by(StandardHostSpecies.host_species)
-        .order_by(db.func.count(Sample.sample_accession).desc())
+        .order_by(
+            db.func.count(Sample.sample_accession).desc(),
+            StandardHostSpecies.host_species,
+        )
         .all()
     )
     standard_hostspecies = set(
@@ -249,7 +256,8 @@ def show_stats():
     nonstandard_hostspecies_counts = (
         db.session.query(Sample.host_species, db.func.count(Sample.sample_accession))
         .filter(Sample.host_species.notin_(standard_hostspecies))
-        .order_by(db.func.count(Sample.sample_accession).desc())
+        .group_by(Sample.host_species)
+        .order_by(db.func.count(Sample.sample_accession).desc(), Sample.host_species)
     )
 
     num_samples_with_primer = (
@@ -340,6 +348,11 @@ def export_run(run_acc):
         )
     else:
         return render_template("failed_export.html", run_acc=run_acc)
+
+
+@app.route("/description")
+def show_description():
+    return render_template("description.html")
 
 
 @app.route("/")
