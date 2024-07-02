@@ -10,19 +10,27 @@
 {% endif %}
 
 Standard sample types:
-<table>
-<tr><th>SampleType</th><th>Count</th></tr>
-{% for s in standard_sampletype_counts %}
-<tr><td>{{ s.sample_type }}</td><td>{{ s[1] }}</td></tr>
-{% endfor %}
+<table class="display" id="standard_sampletypes">
+    <thead>
+        <tr><th>SampleType</th><th>Count</th></tr>
+    </thead>
+    <tbody>
+        {% for s in standard_sampletype_counts %}
+        <tr><td>{{ s.sample_type }}</td><td>{{ s[1] }}</td></tr>
+        {% endfor %}
+    </tbody>
 </table>
 
 Nonstandard sample types:
-<table>
-<tr><th>SampleType</th><th>Count</th></tr>
-{% for s in nonstandard_sampletype_counts %}
-<tr><td>{{ s.sample_type }}</td><td>{{ s[1] }}</td></tr>
-{% endfor %}
+<table class="display" id="nonstandard_sampletypes">
+    <thead>
+        <tr><th>SampleType</th><th>Count</th></tr>
+    </thead>
+    <tbody>
+        {% for s in nonstandard_sampletype_counts %}
+        <tr><td>{{ s.sample_type }}</td><td>{{ s[1] }}</td></tr>
+        {% endfor %}
+    </tbody>
 </table>
 
 {% if num_subjectid != 0 %}
@@ -34,18 +42,51 @@ Nonstandard sample types:
 {% endif %}
 
 Standard host species:
-<table>
-<tr><th>HostSpecies</th><th>Count</th></tr>
-{% for s in standard_hostspecies_counts %}
-<tr><td>{{ s.host_species }}</td><td>{{ s[1] }}</td></tr>
-{% endfor %}
+<table class="display" id="standard_hostspecies">
+    <thead>
+        <tr><th>HostSpecies</th><th>Count</th></tr>
+    </thead>
+    <tbody>
+        {% for s in standard_hostspecies_counts %}
+        <tr><td>{{ s.host_species }}</td><td>{{ s[1] }}</td></tr>
+        {% endfor %}
+    </tbody>
 </table>
 
 Nonstandard host species:
-<table>
-<tr><th>HostSpecies</th><th>Count</th></tr>
-{% for s in nonstandard_hostspecies_counts %}
-<tr><td>{{ s.host_species }}</td><td>{{ s[1] }}</td></tr>
-{% endfor %}
+<table class="display" id="nonstandard_hostspecies">
+    <thead>
+        <tr><th>HostSpecies</th><th>Count</th></tr>
+    </thead>
+    <tbody>
+        {% for s in nonstandard_hostspecies_counts %}
+        <tr><td>{{ s.host_species }}</td><td>{{ s[1] }}</td></tr>
+        {% endfor %}
+    </tbody>
 </table>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        /* Set up data table */
+        $('#standard_sampletypes').dataTable({
+            "bSort": false,
+            "bPaginate": false,
+        });
+
+        $('#nonstandard_sampletypes').dataTable({
+            "bSort": false,
+            "bPaginate": false,
+        });
+
+        $('#standard_hostspecies').dataTable({
+            "bSort": false,
+            "bPaginate": false,
+        });
+
+        $('#nonstandard_hostspecies').dataTable({
+            "bSort": false,
+            "bPaginate": false,
+        });
+    });
+</script>
 {% endblock %}

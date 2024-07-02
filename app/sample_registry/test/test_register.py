@@ -105,9 +105,9 @@ def test_register_run(db, temp_sample_file):
     register_run(run_args, db, out)
 
     # Check that accession number is printed
-    assert out.getvalue() == "Registered run 3 in the database\n"
+    assert out.getvalue() == "Registered run 4 in the database\n"
 
-    run = db.scalar(select(Run).where(Run.run_accession == 3))
+    run = db.scalar(select(Run).where(Run.run_accession == 4))
     assert run.lane == 1
     assert run.run_date == "2008-09-21"
     assert run.machine_type == "Illumina-MiSeq"
@@ -132,33 +132,33 @@ def test_register_illumina_file(tmpdir, db):
     finally:
         os.chdir(original_cwd)
 
-    assert db.scalar(select(Run.data_uri).where(Run.run_accession == 3)) == relative_fp
+    assert db.scalar(select(Run.data_uri).where(Run.run_accession == 4)) == relative_fp
 
 
 def test_register_samples(db, temp_sample_file):
     register_run(run_args, db)
     sample_file = temp_sample_file
-    args = ["3", sample_file.name]
+    args = ["4", sample_file.name]
     register_sample_annotations(args, True, db)
 
     # Check that accession number is assigned
     assert db.scalars(
-        select(Sample.sample_accession).where(Sample.run_accession == 3)
-    ).all() == [5, 6]
+        select(Sample.sample_accession).where(Sample.run_accession == 4)
+    ).all() == [6, 7]
     assert (
-        db.scalar(select(Sample.barcode_sequence).where(Sample.sample_accession == 5))
+        db.scalar(select(Sample.barcode_sequence).where(Sample.sample_accession == 6))
         == "GGGCCT"
     )
     # Check that standard annotations are saved to the database
     assert (
-        db.scalar(select(Sample.sample_type).where(Sample.sample_accession == 5))
+        db.scalar(select(Sample.sample_type).where(Sample.sample_accession == 6))
         == "Oral swab"
     )
     # Check that annotations are saved to the database
     assert (
         db.scalar(
             select(Annotation.val).where(
-                and_(Annotation.sample_accession == 5, Annotation.key == "bb")
+                and_(Annotation.sample_accession == 6, Annotation.key == "bb")
             )
         )
         == "cd e29"
@@ -166,7 +166,7 @@ def test_register_samples(db, temp_sample_file):
     assert (
         db.scalar(
             select(Annotation.val).where(
-                and_(Annotation.sample_accession == 5, Annotation.key == "ll")
+                and_(Annotation.sample_accession == 6, Annotation.key == "ll")
             )
         )
         == "mno 1"
@@ -174,17 +174,17 @@ def test_register_samples(db, temp_sample_file):
 
     # Check that the second sample is registered
     assert (
-        db.scalar(select(Sample.barcode_sequence).where(Sample.sample_accession == 6))
+        db.scalar(select(Sample.barcode_sequence).where(Sample.sample_accession == 7))
         == "TTTCCC"
     )
     assert (
-        db.scalar(select(Sample.sample_type).where(Sample.sample_accession == 6))
+        db.scalar(select(Sample.sample_type).where(Sample.sample_accession == 7))
         == "Blood"
     )
     assert (
         db.scalar(
             select(Annotation.val).where(
-                and_(Annotation.sample_accession == 6, Annotation.key == "bb")
+                and_(Annotation.sample_accession == 7, Annotation.key == "bb")
             )
         )
         == "asdf"
@@ -198,29 +198,29 @@ def test_register_samples(db, temp_sample_file):
 def test_register_annotations(db, temp_sample_file, temp_modified_sample_file):
     register_run(run_args, db)
     sample_file = temp_sample_file
-    args = ["3", sample_file.name]
+    args = ["4", sample_file.name]
     register_sample_annotations(args, True, db)
 
     sample_file = temp_modified_sample_file
-    args = ["3", sample_file.name]
+    args = ["4", sample_file.name]
     register_sample_annotations(args, False, db)
 
     # Check that the first sample is updated
     assert (
-        db.scalar(select(Sample.sample_type).where(Sample.sample_accession == 5))
+        db.scalar(select(Sample.sample_type).where(Sample.sample_accession == 6))
         == "Feces"
     )
     assert (
         db.scalar(
             select(Annotation.val).where(
-                and_(Annotation.sample_accession == 5, Annotation.key == "fg")
+                and_(Annotation.sample_accession == 6, Annotation.key == "fg")
             )
         )
         == "hi5 34"
     )
     assert not db.scalar(
         select(Annotation.val).where(
-            and_(Annotation.sample_accession == 5, Annotation.key == "bb")
+            and_(Annotation.sample_accession == 6, Annotation.key == "bb")
         )
     )
 
@@ -228,14 +228,14 @@ def test_register_annotations(db, temp_sample_file, temp_modified_sample_file):
 def test_unregister_samples(db, temp_sample_file):
     register_run(run_args, db)
     sample_file = temp_sample_file
-    args = ["3", sample_file.name]
+    args = ["4", sample_file.name]
     register_sample_annotations(args, True, db)
 
-    unregister_samples(["3"], db)
+    unregister_samples(["4"], db)
 
-    assert not db.scalar(select(Sample).where(Sample.run_accession == 3))
-    assert not db.scalar(select(Annotation).where(Annotation.sample_accession == 5))
+    assert not db.scalar(select(Sample).where(Sample.run_accession == 4))
     assert not db.scalar(select(Annotation).where(Annotation.sample_accession == 6))
+    assert not db.scalar(select(Annotation).where(Annotation.sample_accession == 7))
 
 
 def test_register_sample_types(db):

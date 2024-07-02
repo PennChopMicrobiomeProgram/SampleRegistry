@@ -70,7 +70,7 @@ def test_register_run(db):
             "/path/to/data/",
             "A comment",
         )
-        == 3
+        == 4
     )
 
 

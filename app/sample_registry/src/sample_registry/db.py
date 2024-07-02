@@ -37,23 +37,32 @@ def create_test_db(session: sessionmaker = None):
 
     run1 = Run(
         run_accession=1,
-        run_date=datetime.now(),
-        machine_type="Illumina",
-        machine_kit="MiSeq",
-        lane=1,
-        data_uri="run1",
+        run_date="2024-07-02",
+        machine_type="Illumina-NovaSeq",
+        machine_kit="Nextera XT",
+        lane=2,
+        data_uri="raw_data/run1/Undetermined_S0_L002_R1_001.fastq.gz",
         comment="Test run 1",
     )
     run2 = Run(
         run_accession=2,
-        run_date=datetime.now(),
-        machine_type="Illumina",
-        machine_kit="MiSeq",
-        lane=1,
-        data_uri="run2",
+        run_date="2024-06-27",
+        machine_type="Illumina-Novaseq",
+        machine_kit="MiSeq Reagent Kit v3",
+        lane=4,
+        data_uri="raw_data/run2/Undetermined_S0_L004_R1_001.fastq.gz",
         comment="Test run 2",
     )
-    session.bulk_save_objects([run1, run2])
+    run3 = Run(
+        run_accession=3,
+        run_date="2024-06-27",
+        machine_type="Illumina-Novaseq",
+        machine_kit="MiSeq Reagent Kit v3",
+        lane=1,
+        data_uri="raw_data/run3/Undetermined_S0_L001_R1_001.fastq.gz",
+        comment="Test run 3 (NO SAMPLES)",
+    )
+    session.bulk_save_objects([run1, run2, run3])
 
     sample1 = Sample(
         sample_accession=1,
@@ -95,7 +104,17 @@ def create_test_db(session: sessionmaker = None):
         subject_id="Subject4",
         host_species="Human",
     )
-    session.bulk_save_objects([sample1, sample2, sample3, sample4])
+    sample5 = Sample(
+        sample_accession=5,
+        sample_name="Sample5",
+        run_accession=run2.run_accession,
+        barcode_sequence="TTTT",
+        primer_sequence="AAAA",
+        sample_type="Non-Standard Sample Type",
+        subject_id="Subject5",
+        host_species="Non-Standard Host Species",
+    )
+    session.bulk_save_objects([sample1, sample2, sample3, sample4, sample5])
 
     annotations = [
         Annotation(
@@ -195,7 +214,12 @@ def query_tag_stats(db: SQLAlchemy, tag: str):
                 Run.comment.label("run_comment"),
             )
             .join(Run, Sample.run_accession == Run.run_accession)
-            .group_by(Sample.run_accession)
+            .group_by(
+                Sample.run_accession,
+                getattr(Sample, STANDARD_TAGS[tag]),
+                Run.run_date,
+                Run.comment,
+            )
             .all()
         )
     else:
@@ -210,7 +234,13 @@ def query_tag_stats(db: SQLAlchemy, tag: str):
             )
             .join(Run, Sample.run_accession == Run.run_accession)
             .join(Annotation, Annotation.sample_accession == Sample.sample_accession)
-            .group_by(Sample.run_accession, Annotation.key, Annotation.val)
+            .group_by(
+                Sample.run_accession,
+                Annotation.key,
+                Annotation.val,
+                Run.run_date,
+                Run.comment,
+            )
             .order_by(
                 Annotation.key,
                 Run.run_date.desc(),
