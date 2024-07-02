@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block body %}
+This is a site for viewing sequencing run data.  You can browse runs, view samples, and search for samples by metadata tags. Submitting and modifying the data is done through a CLI on our server.
+
+The purpose of this page is mostly to provide a low-latency readiness/liveness probe target (as the index redirects to browse_runs which is slow to load all the sample counts).
+{% endblock %}
