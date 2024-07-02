@@ -170,7 +170,7 @@ def show_runs(run_acc=None):
             "show_run.html", run=run, samples=samples, sample_metadata=keyed_annotations
         )
     else:
-        runs = db.session.query(Run).all()
+        runs = db.session.query(Run).all()[::-1]
         return render_template("browse_runs.html", runs=runs)
 
 
