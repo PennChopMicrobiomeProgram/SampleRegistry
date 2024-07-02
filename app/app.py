@@ -172,11 +172,14 @@ def show_runs(run_acc=None):
     else:
         runs = db.session.query(Run).all()[::-1]
         sample_counts = {
-            run: db.session.query(Sample)
-            .filter(Sample.run_accession == run.run_accession)
-            .count()
-            for run in runs
+            d[0]: d[1]
+            for d in db.session.query(
+                Sample.run_accession, db.func.count(Sample.sample_accession)
+            )
+            .group_by(Sample.run_accession)
+            .all()
         }
+        sample_counts = {run: sample_counts.get(run.run_accession, 0) for run in runs}
         return render_template("browse_runs.html", sample_counts=sample_counts)
 
 
