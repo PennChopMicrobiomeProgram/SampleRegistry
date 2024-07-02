@@ -171,8 +171,13 @@ def show_runs(run_acc=None):
         )
     else:
         runs = db.session.query(Run).all()[::-1]
-        sample_counts = {r.run_accession: len([s for s in db.session.query(Sample).filter(Sample.run_accession == r.run_accession)]) for r in runs}
-        return render_template("browse_runs.html", runs=runs, sample_counts=sample_counts)
+        sample_counts = {
+            r: db.session.query(Sample)
+            .filter(Sample.run_accession == r.run_accession)
+            .count()
+            for r in runs
+        }
+        return render_template("browse_runs.html", runs=runs)
 
 
 @app.route("/stats")
@@ -197,15 +202,13 @@ def show_stats():
         .order_by(db.func.count(Sample.sample_accession).desc())
         .all()
     )
+    standard_sampletypes = set(
+        s.sample_type for s in db.session.query(StandardSampleType.sample_type).all()
+    )
     nonstandard_sampletype_counts = (
         db.session.query(Sample.sample_type, db.func.count(Sample.sample_accession))
-        .outerjoin(
-            StandardSampleType, Sample.sample_type == StandardSampleType.sample_type
-        )
-        .filter(StandardSampleType.sample_type is None)
-        .group_by(Sample.sample_type)
+        .filter(Sample.sample_type.notin_(standard_sampletypes))
         .order_by(db.func.count(Sample.sample_accession).desc())
-        .all()
     )
 
     num_subjectid = (
@@ -240,15 +243,13 @@ def show_stats():
         .order_by(db.func.count(Sample.sample_accession).desc())
         .all()
     )
+    standard_hostspecies = set(
+        s.host_species for s in db.session.query(StandardHostSpecies.host_species).all()
+    )
     nonstandard_hostspecies_counts = (
         db.session.query(Sample.host_species, db.func.count(Sample.sample_accession))
-        .outerjoin(
-            StandardHostSpecies, Sample.host_species == StandardHostSpecies.host_species
-        )
-        .filter(StandardHostSpecies.host_species is None)
-        .group_by(Sample.host_species)
+        .filter(Sample.host_species.notin_(standard_hostspecies))
         .order_by(db.func.count(Sample.sample_accession).desc())
-        .all()
     )
 
     num_samples_with_primer = (
