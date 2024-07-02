@@ -28,10 +28,10 @@
       {% set platform = platform + ' ' + run.machine_kit %}
       <tr>
         <td><a href="{{ url_for('show_runs', run_acc=run.run_accession) }}">{{ "CMR{:06d}".format(run.run_accession) }}</a></td>
-        <td><span class="date">{{ "/".join(run.run_date.split("-")[1:][::-1]) }}</span></td>
+        <td><span class="date">{{ run.run_date }}</span></td>
         <td><nobr>{{ platform }}</nobr></td>
         <td>{{ run.lane }}</td>
-        <td>{{ run.sample_count }}</td>
+        <td>{{ sample_counts[run.run_accession] }}</td>
         <td>{{ run.comment }}</td>
       </tr>
   {% endfor %}

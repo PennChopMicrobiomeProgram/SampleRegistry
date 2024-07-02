@@ -171,7 +171,8 @@ def show_runs(run_acc=None):
         )
     else:
         runs = db.session.query(Run).all()[::-1]
-        return render_template("browse_runs.html", runs=runs)
+        sample_counts = {r.run_accession: len([s for s in db.session.query(Sample).filter(Sample.run_accession == r.run_accession)]) for r in runs}
+        return render_template("browse_runs.html", runs=runs, sample_counts=sample_counts)
 
 
 @app.route("/stats")

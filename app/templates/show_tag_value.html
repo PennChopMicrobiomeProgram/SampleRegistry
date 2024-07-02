@@ -21,7 +21,7 @@
         <tr>
           <td>{{ sample.sample_name }}</td>
                               <td>{{ sample.primer_sequence|upper }}</td>
-          <td><span class="date">{{ "/".join(sample.run_date.split("-")) }}</span></td>
+          <td><span class="date">{{ sample.run_date }}</span></td>
           <td><a href="{{ url_for('show_runs', run_acc = sample.run_accession) }}">{{ "CMR{:06d}".format(sample.run_accession) }}</a></td>
           <td><div class="metadata toggle">
             <ul>

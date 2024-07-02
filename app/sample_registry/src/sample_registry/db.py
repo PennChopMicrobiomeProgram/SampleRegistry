@@ -37,7 +37,7 @@ def create_test_db(session: sessionmaker = None):
 
     run1 = Run(
         run_accession=1,
-        run_date=datetime.now(),
+        run_date="2024-07-02",
         machine_type="Illumina",
         machine_kit="MiSeq",
         lane=1,
@@ -46,7 +46,7 @@ def create_test_db(session: sessionmaker = None):
     )
     run2 = Run(
         run_accession=2,
-        run_date=datetime.now(),
+        run_date="2024-06-27",
         machine_type="Illumina",
         machine_kit="MiSeq",
         lane=1,
@@ -195,7 +195,7 @@ def query_tag_stats(db: SQLAlchemy, tag: str):
                 Run.comment.label("run_comment"),
             )
             .join(Run, Sample.run_accession == Run.run_accession)
-            .group_by(Sample.run_accession)
+            .group_by(Sample.run_accession, getattr(Sample, STANDARD_TAGS[tag]))
             .all()
         )
     else:
@@ -210,7 +210,7 @@ def query_tag_stats(db: SQLAlchemy, tag: str):
             )
             .join(Run, Sample.run_accession == Run.run_accession)
             .join(Annotation, Annotation.sample_accession == Sample.sample_accession)
-            .group_by(Sample.run_accession, Annotation.key, Annotation.val)
+            .group_by(Sample.run_accession, Annotation.key, Annotation.val, Run.run_date)
             .order_by(
                 Annotation.key,
                 Run.run_date.desc(),
