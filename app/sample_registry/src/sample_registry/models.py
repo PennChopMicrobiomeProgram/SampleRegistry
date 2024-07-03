@@ -9,7 +9,7 @@ class Base(DeclarativeBase):
 
 class Run(Base):
     __tablename__ = "runs"
-    run_accession: Mapped[int] = mapped_column(primary_key=True)
+    run_accession: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     run_date: Mapped[str]
     machine_type: Mapped[str]
     machine_kit: Mapped[str]
@@ -24,7 +24,7 @@ class Run(Base):
 
 class Sample(Base):
     __tablename__ = "samples"
-    sample_accession: Mapped[int] = mapped_column(primary_key=True)
+    sample_accession: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     sample_name: Mapped[str]
     run_accession: Mapped[int] = mapped_column(ForeignKey("runs.run_accession"))
     barcode_sequence: Mapped[str]
