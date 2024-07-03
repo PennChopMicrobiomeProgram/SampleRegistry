@@ -43,11 +43,17 @@ class SampleRegistry(object):
         data_uri: str,
         comment: str,
     ) -> int:
+        # Using this because there are situations where the autoincrement is untrustworthy
+        max_run_accession = self.session.scalar(
+            select(Run.run_accession).order_by(Run.run_accession.desc()).limit(1)
+        )
+
         return self.session.scalar(
             insert(Run)
             .returning(Run.run_accession)
             .values(
                 {
+                    "run_accession": max_run_accession + 1 if max_run_accession else 1,
                     "run_date": run_date,
                     "machine_type": machine_type,
                     "machine_kit": machine_kit,
@@ -91,17 +97,31 @@ class SampleRegistry(object):
         ).first():
             raise ValueError("Samples already registered for run %s" % run_accession)
 
+        # Using this because there are situations where the autoincrement is untrustworthy
+        max_sample_accession = self.session.scalar(
+            select(Sample.sample_accession)
+            .order_by(Sample.sample_accession.desc())
+            .limit(1)
+        )
+
         return self.session.scalars(
             insert(Sample)
             .returning(Sample.sample_accession)
             .values(
                 [
                     {
+                        "sample_accession": (
+                            max_sample_accession + i + 1
+                            if max_sample_accession
+                            else i + 1
+                        ),
                         "run_accession": run_accession,
                         "sample_name": sample_name,
                         "barcode_sequence": barcode_sequence,
                     }
-                    for sample_name, barcode_sequence in sample_table.core_info
+                    for i, (sample_name, barcode_sequence) in enumerate(
+                        sample_table.core_info
+                    )
                 ]
             )
         )
