@@ -13,12 +13,9 @@ from .models import (
 
 
 STANDARD_TAGS = {
-    "SampleID": "sample_name",
     "SampleType": "sample_type",
     "SubjectID": "subject_id",
     "HostSpecies": "host_species",
-    "Barcode": "barcode_sequence",
-    "Primer": "primer_sequence",
 }
 
 
@@ -297,9 +294,17 @@ def run_to_dataframe(db: SQLAlchemy, run_acc: str) -> dict[str, str]:
                 table[a.key].append("NA")
         table["sample_accession"].append("CMS{:06d}".format(s.sample_accession))
 
-    # Convert table keys according to STANDARD_TAGS map
+    # Convert table keys according to REPLACEMENTS map
+    REPLACEMENTS = {
+        "SampleID": "sample_name",
+        "SampleType": "sample_type",
+        "SubjectID": "subject_id",
+        "HostSpecies": "host_species",
+        "Barcode": "barcode_sequence",
+        "Primer": "primer_sequence",
+    }
     table = {
-        {v: k for k, v in STANDARD_TAGS.items()}.get(k, k): v for k, v in table.items()
+        {v: k for k, v in REPLACEMENTS.items()}.get(k, k): v for k, v in table.items()
     }
 
     return table
