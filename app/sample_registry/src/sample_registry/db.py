@@ -21,6 +21,7 @@ STANDARD_TAGS = {
     "Primer": "primer_sequence",
 }
 
+
 def create_test_db(session: sessionmaker = None):
     if not session:
         from . import engine
@@ -260,9 +261,7 @@ def run_to_dataframe(db: SQLAlchemy, run_acc: str) -> dict[str, str]:
         return {}
 
     samples = (
-        db.session.query(Sample)
-        .filter(Sample.run_accession == run.run_accession)
-        .all()
+        db.session.query(Sample).filter(Sample.run_accession == run.run_accession).all()
     )
     annotations = (
         db.session.query(Annotation)
@@ -270,7 +269,14 @@ def run_to_dataframe(db: SQLAlchemy, run_acc: str) -> dict[str, str]:
         .all()
     )
 
-    col_names = ["sample_name", "barcode_sequence", "primer_sequence", "sample_type", "subject_id", "host_species"]
+    col_names = [
+        "sample_name",
+        "barcode_sequence",
+        "primer_sequence",
+        "sample_type",
+        "subject_id",
+        "host_species",
+    ]
     for a in annotations:
         if a.key not in col_names:
             col_names.append(a.key)
@@ -292,7 +298,9 @@ def run_to_dataframe(db: SQLAlchemy, run_acc: str) -> dict[str, str]:
         table["sample_accession"].append("CMS{:06d}".format(s.sample_accession))
 
     # Convert table keys according to STANDARD_TAGS map
-    table = {{v: k for k, v in STANDARD_TAGS.items()}.get(k, k): v for k, v in table.items()}
+    table = {
+        {v: k for k, v in STANDARD_TAGS.items()}.get(k, k): v for k, v in table.items()
+    }
 
     return table
 

@@ -294,51 +294,6 @@ def show_stats():
     )
 
 
-@app.route("/export/<run_acc>")
-def export_run(run_acc):
-    if run_acc.endswith(".txt"):
-        run_acc = run_acc[:-4]
-        run = db.session.query(Run).filter(Run.run_accession == run_acc).first()
-        samples = (
-            db.session.query(Sample)
-            .filter(Sample.run_accession == run_acc)
-            .order_by(Sample.sample_name, Sample.sample_accession)
-            .all()
-        )
-        annotations = (
-            db.session.query(Annotation)
-            .filter(
-                Annotation.sample_accession.in_([s.sample_accession for s in samples])
-            )
-            .all()
-        )
-
-        # Change ReversePrimerSequence for compatibility with QIIME
-        for a in annotations:
-            if a.key == "ReversePrimerSequence":
-                a.key = "ReversePrimer"
-
-        cols, table = cast_annotations(annotations, samples)
-
-        return render_template(
-            "export_qiime.txt",
-            run=run,
-            samples=samples,
-            metadata=table,
-            metadata_columns=cols,
-        )
-    elif run_acc.endswith(".tsv"):
-        table = run_to_dataframe(db, run_acc[:-4])
-
-        return render_template(
-            "export_delim.txt",
-            col_headers=table.keys(),
-            rows=zip(*table.values()),
-        )
-    else:
-        return render_template("failed_export.html", run_acc=run_acc)
-    
-
 @app.route("/download/<run_acc>", methods=["GET", "POST"])
 def download(run_acc):
     ext = run_acc[-4:]
@@ -350,7 +305,11 @@ def download(run_acc):
 
     if ext == ".txt":
         run = db.session.query(Run).filter(Run.run_accession == run_acc).first()
-        QIIME_HEADERS = {"Barcode": "BarcodeSequence", "Primer": "LinkerPrimerSequence", "sample_accession": "Description"}
+        QIIME_HEADERS = {
+            "Barcode": "BarcodeSequence",
+            "Primer": "LinkerPrimerSequence",
+            "sample_accession": "Description",
+        }
         t = {QIIME_HEADERS.get(k, k): v for k, v in t.items()}
         commented_headers = [f"#{list(t.keys())[0]}"] + list(t.keys())[1:]
         writer.writerow(commented_headers)
@@ -368,12 +327,10 @@ def download(run_acc):
             writer.writerow(row)
     else:
         return render_template("failed_export.html", run_acc=run_acc)
-    
+
     # Create the response and set the appropriate headers
     response = make_response(csv_file.getvalue())
-    response.headers["Content-Disposition"] = (
-        f"attachment; filename={run_acc}{ext}"
-    )
+    response.headers["Content-Disposition"] = f"attachment; filename={run_acc}{ext}"
     response.headers["Content-type"] = "text/csv"
     return response
 
