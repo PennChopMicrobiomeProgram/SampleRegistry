@@ -1,7 +1,9 @@
+import csv
 import pickle
 import os
 from flask import (
     Flask,
+    make_response,
     render_template,
     url_for,
     request,
@@ -10,6 +12,7 @@ from flask import (
     send_from_directory,
 )
 from flask_sqlalchemy import SQLAlchemy
+from io import StringIO
 from pathlib import Path
 from sample_registry import SQLALCHEMY_DATABASE_URI
 from sample_registry.models import (
@@ -20,7 +23,7 @@ from sample_registry.models import (
     StandardHostSpecies,
     StandardSampleType,
 )
-from sample_registry.db import cast_annotations, query_tag_stats, STANDARD_TAGS
+from sample_registry.db import run_to_dataframe, query_tag_stats, STANDARD_TAGS
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
@@ -291,66 +294,45 @@ def show_stats():
     )
 
 
-@app.route("/export/<run_acc>")
-def export_run(run_acc):
-    if run_acc.endswith(".txt"):
-        run_acc = run_acc[:-4]
+@app.route("/download/<run_acc>", methods=["GET", "POST"])
+def download(run_acc):
+    ext = run_acc[-4:]
+    run_acc = run_acc[:-4]
+    print(run_acc, ext)
+    t = run_to_dataframe(db, run_acc)
+    csv_file = StringIO()
+    writer = csv.writer(csv_file, delimiter="\t")
+
+    if ext == ".txt":
         run = db.session.query(Run).filter(Run.run_accession == run_acc).first()
-        samples = (
-            db.session.query(Sample)
-            .filter(Sample.run_accession == run_acc)
-            .order_by(Sample.sample_name, Sample.sample_accession)
-            .all()
-        )
-        annotations = (
-            db.session.query(Annotation)
-            .filter(
-                Annotation.sample_accession.in_([s.sample_accession for s in samples])
-            )
-            .all()
-        )
-
-        # Change ReversePrimerSequence for compatibility with QIIME
-        for a in annotations:
-            if a.key == "ReversePrimerSequence":
-                a.key = "ReversePrimer"
-
-        cols, table = cast_annotations(annotations, samples)
-
-        return render_template(
-            "export_qiime.txt",
-            run=run,
-            samples=samples,
-            metadata=table,
-            metadata_columns=cols,
-        )
-    elif run_acc.endswith(".tsv"):
-        run_acc = run_acc[:-4]
-        run = db.session.query(Run).filter(Run.run_accession == run_acc).first()
-        samples = (
-            db.session.query(Sample)
-            .filter(Sample.run_accession == run_acc)
-            .order_by(Sample.sample_name, Sample.sample_accession)
-            .all()
-        )
-        annotations = (
-            db.session.query(Annotation)
-            .filter(
-                Annotation.sample_accession.in_([s.sample_accession for s in samples])
-            )
-            .all()
-        )
-        cols, table = cast_annotations(annotations, samples)
-
-        return render_template(
-            "export_delim.txt",
-            run=run,
-            samples=samples,
-            metadata=table,
-            metadata_columns=cols,
-        )
+        QIIME_HEADERS = {
+            "Barcode": "BarcodeSequence",
+            "Primer": "LinkerPrimerSequence",
+            "sample_accession": "Description",
+        }
+        t = {QIIME_HEADERS.get(k, k): v for k, v in t.items()}
+        commented_headers = [f"#{list(t.keys())[0]}"] + list(t.keys())[1:]
+        writer.writerow(commented_headers)
+        writer.writerow([f"#{run.comment.strip()}"])
+        writer.writerow([f"#Sequencing date: {run.run_date}"])
+        writer.writerow([f"#File name: {run.data_uri.split('/')[-1]}"])
+        writer.writerow([f"#Lane: {run.lane}"])
+        writer.writerow([f"#Platform: {run.machine_type} {run.machine_kit}"])
+        writer.writerow([f"#Run accession: CMR{run.run_accession:06d}"])
+        for row in zip(*t.values()):
+            writer.writerow(row)
+    elif ext == ".tsv":
+        writer.writerow(t.keys())
+        for row in zip(*t.values()):
+            writer.writerow(row)
     else:
         return render_template("failed_export.html", run_acc=run_acc)
+
+    # Create the response and set the appropriate headers
+    response = make_response(csv_file.getvalue())
+    response.headers["Content-Disposition"] = f"attachment; filename={run_acc}{ext}"
+    response.headers["Content-type"] = "text/csv"
+    return response
 
 
 @app.route("/description")

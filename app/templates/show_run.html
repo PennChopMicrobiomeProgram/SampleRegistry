@@ -9,7 +9,7 @@
     {% endif %}
     {% set run = run[0] %}
 
-    <form id="samplesForm">
+    <div id="samplesForm">
         <div id="samples_summary" class="summary span-24 last">
             <h2>
             <strong>Run {{ "CMR{:06d}".format(run.run_accession) }}</strong><br/>
@@ -23,8 +23,24 @@
             </ul>
             <p>
             <strong>Export metadata for all samples:</strong><br />
-            <a href="{{ url_for('export_run', run_acc=run.run_accession|string + '.txt') }}">QIIME-compatible mapping file</a><br/>
-            <a href="{{ url_for('export_run', run_acc=run.run_accession|string + '.tsv') }}">Tab-delimited format (compatible with <code>read.delim</code> function in R)</a>
+            <div class="flex flex-row">
+                <div class="card-body flex flex-row">
+                    <form action="{{ '/download/' ~ run.run_accession ~ '.txt' }}" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">Download</button>
+                        <p class="help">QIIME-compatible mapping file</p>
+                    </div>
+                    </form>
+                </div>
+                <div class="card-body flex flex-row">
+                    <form action="{{ '/download/' ~ run.run_accession ~ '.tsv' }}" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">Download</button>
+                        <p class="help">Tab-delimited format (compatible with <code>read.delim</code> function in R)</p>
+                    </div>
+                    </form>
+                </div>
+            </div>
             </p>
         </div>
 
@@ -65,7 +81,7 @@
         {% endfor %}
             </tbody>
         </table>
-    </form>
+    </div>
 {% endif %}
 
 <script type="text/javascript">
