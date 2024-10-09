@@ -1,5 +1,4 @@
 import csv
-from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import delete
 from sqlalchemy.orm import sessionmaker
@@ -14,11 +13,13 @@ from .models import (
 
 
 STANDARD_TAGS = {
+    "SampleID": "sample_name",
     "SampleType": "sample_type",
     "SubjectID": "subject_id",
     "HostSpecies": "host_species",
+    "Barcode": "barcode_sequence",
+    "Primer": "primer_sequence",
 }
-
 
 def create_test_db(session: sessionmaker = None):
     if not session:
@@ -251,6 +252,49 @@ def query_tag_stats(db: SQLAlchemy, tag: str):
             .where(Annotation.key == tag)
             .all()
         )
+
+
+def run_to_dataframe(db: SQLAlchemy, run_acc: str) -> dict[str, str]:
+    run = db.session.query(Run).filter(Run.run_accession == run_acc).first()
+    if not run:
+        return {}
+
+    samples = (
+        db.session.query(Sample)
+        .filter(Sample.run_accession == run.run_accession)
+        .all()
+    )
+    annotations = (
+        db.session.query(Annotation)
+        .filter(Annotation.sample_accession.in_([s.sample_accession for s in samples]))
+        .all()
+    )
+
+    col_names = ["sample_name", "barcode_sequence", "primer_sequence", "sample_type", "subject_id", "host_species"]
+    for a in annotations:
+        if a.key not in col_names:
+            col_names.append(a.key)
+    col_names.append("sample_accession")
+    table = {cn: [] for cn in col_names}
+
+    for s in samples:
+        table["sample_name"].append(s.sample_name)
+        table["barcode_sequence"].append(s.barcode_sequence)
+        table["primer_sequence"].append(s.primer_sequence)
+        table["sample_type"].append(s.sample_type)
+        table["subject_id"].append(s.subject_id)
+        table["host_species"].append(s.host_species)
+        for a in annotations:
+            if a.sample_accession == s.sample_accession:
+                table[a.key].append(a.val)
+            else:
+                table[a.key].append("NA")
+        table["sample_accession"].append("CMS{:06d}".format(s.sample_accession))
+
+    # Convert table keys according to STANDARD_TAGS map
+    table = {{v: k for k, v in STANDARD_TAGS.items()}.get(k, k): v for k, v in table.items()}
+
+    return table
 
 
 def cast_annotations(

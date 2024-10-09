@@ -1,16 +1,4 @@
-SampleID    Barcode    Primer    SampleType    HostSpecies    SubjectID    {% if metadata_columns %}{{ metadata_columns|join("\t") }}    {% endif %}sample_accession
-{% for sample in samples %}
-    {% set head_vals = [
-        sample.sample_name,
-        sample.barcode_sequence|upper,
-        sample.primer_sequence|upper,
-        sample.sample_type if sample.sample_type else "NA",
-        sample.host_species if sample.host_species else "NA",
-        sample.subject_id if sample.subject_id else "NA"
-    ] %}
-    {{ head_vals|join("\t") }}    {% if metadata_columns %}{{ metadata[sample.sample_accession]|join("\t") }}    {% endif %}
-    {% set tail_vals = [
-        "CMS{:06d}".format(sample.sample_accession)
-    ] %}
-    {{ tail_vals|join("\t") }}
+{% for col_header in col_headers %}{{ col_header }}{% if not loop.last %}\t{% endif %}{% endfor %}<br />
+{% for row in rows %}
+{% for col in row %}{{ col }}{% if not loop.last %}\t{% endif %}{% endfor %}<br />
 {% endfor %}
