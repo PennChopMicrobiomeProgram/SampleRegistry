@@ -4,7 +4,7 @@ from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-__version__ = "1.0.2"
+__version__ = "1.0.4"
 
 
 def sample_registry_version():

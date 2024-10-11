@@ -45,7 +45,7 @@ with app.app_context():
 @app.route("/favicon.ico")
 def favicon():
     return send_from_directory(
-        Path(app.root_path) / "static" / "img",
+        Path(app.root_path) / "static",
         "favicon.ico",
         mimetype="image/vnd.microsoft.icon",
     )
