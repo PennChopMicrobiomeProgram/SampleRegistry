@@ -17,7 +17,7 @@ class SampleRegistry(object):
         "Illumina-HiSeq",
         "Illumina-NovaSeq",
         "Illumina-MiniSeq",
-        "Illumina-NextSeq"
+        "Illumina-NextSeq",
     ]
     kits = ["Nextera XT"]
 

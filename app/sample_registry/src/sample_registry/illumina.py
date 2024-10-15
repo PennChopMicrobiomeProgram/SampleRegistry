@@ -8,7 +8,7 @@ class IlluminaFastq(object):
         "M": "Illumina-MiSeq",
         "A": "Illumina-NovaSeq",
         "N": "Illumina-MiniSeq",
-        "V": "Illumina-NextSeq"
+        "V": "Illumina-NextSeq",
     }
 
     def __init__(self, f):
