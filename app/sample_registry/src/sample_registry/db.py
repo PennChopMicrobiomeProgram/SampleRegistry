@@ -1,4 +1,6 @@
 import csv
+import os
+import sys
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import delete
 from sqlalchemy.orm import sessionmaker
@@ -28,11 +30,10 @@ def create_test_db(session: sessionmaker = None):
         Base.metadata.create_all(engine)
 
     if session.query(Run).count() > 0:
-        session.execute(delete(Run))
-        session.execute(delete(Sample))
-        session.execute(delete(Annotation))
-        session.execute(delete(StandardSampleType))
-        session.execute(delete(StandardHostSpecies))
+        sys.stderr.write(
+            "Database already contains data, please delete any existing test database before running this command"
+        )
+        sys.exit(1)
 
     run1 = Run(
         run_accession=1,
