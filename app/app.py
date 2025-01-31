@@ -298,7 +298,6 @@ def show_stats():
 def download(run_acc):
     ext = run_acc[-4:]
     run_acc = run_acc[:-4]
-    print(run_acc, ext)
     t = run_to_dataframe(db, run_acc)
     csv_file = StringIO()
     writer = csv.writer(csv_file, delimiter="\t")
