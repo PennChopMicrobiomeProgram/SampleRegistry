@@ -4,6 +4,7 @@ import sys
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import delete
 from sqlalchemy.orm import sessionmaker
+from . import NULL_VALUES
 from .models import (
     Base,
     Run,
@@ -283,17 +284,30 @@ def run_to_dataframe(db: SQLAlchemy, run_acc: str) -> dict[str, str]:
 
     for s in samples:
         table["sample_name"].append(s.sample_name)
-        table["barcode_sequence"].append(s.barcode_sequence)
-        table["primer_sequence"].append(s.primer_sequence)
-        table["sample_type"].append(s.sample_type)
-        table["subject_id"].append(s.subject_id)
-        table["host_species"].append(s.host_species)
-        for a in annotations:
-            if a.sample_accession == s.sample_accession:
-                table[a.key].append(a.val)
-            else:
-                table[a.key].append("NA")
+        (
+            table["barcode_sequence"].append(s.barcode_sequence)
+            if s.barcode_sequence
+            else None
+        )
+        (
+            table["primer_sequence"].append(s.primer_sequence)
+            if s.primer_sequence
+            else None
+        )
+        table["sample_type"].append(s.sample_type) if s.sample_type else None
+        table["subject_id"].append(s.subject_id) if s.subject_id else None
+        table["host_species"].append(s.host_species) if s.host_species else None
+        for a in (a for a in annotations if a.sample_accession == s.sample_accession):
+            table[a.key].append(a.val)
         table["sample_accession"].append("CMS{:06d}".format(s.sample_accession))
+
+        # Fill in missing values as NA
+        l = len(table["sample_accession"])
+        for k in col_names:
+            if len(table[k]) < l:
+                table[k].append("NA")
+            if table[k][-1] in NULL_VALUES:
+                table[k][-1] = "NA"
 
     # Convert table keys according to REPLACEMENTS map
     REPLACEMENTS = {

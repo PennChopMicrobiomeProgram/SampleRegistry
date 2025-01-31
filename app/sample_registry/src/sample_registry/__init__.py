@@ -7,6 +7,10 @@ from sqlalchemy.orm import sessionmaker
 __version__ = "1.1.0"
 
 
+# Doesn't include "NA" because that's what we fill in for missing values
+NULL_VALUES = [None, "", "null", "NULL", "None", "none", "NONE", "N/A", "n/a", "na"]
+
+
 def sample_registry_version():
     sys.stderr.write(__version__)
 
