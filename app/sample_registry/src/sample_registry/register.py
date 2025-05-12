@@ -149,7 +149,7 @@ def register_illumina_file(argv=None, session: Session = None, out=sys.stdout):
         f.machine_type,
         "Nextera XT",
         f.lane,
-        f.filepath,
+        str(f.filepath),
         args.comment,
     )
 
