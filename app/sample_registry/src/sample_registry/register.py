@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from typing import Generator
 from sample_registry.mapping import SampleTable
 from sample_registry.registrar import SampleRegistry
-from seqBackupLib import IlluminaFastq
+from seqbackup import IlluminaFastq
 
 
 SAMPLES_DESC = """\
