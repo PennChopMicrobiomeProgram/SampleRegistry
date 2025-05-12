@@ -6,8 +6,8 @@ import gzip
 from sqlalchemy.orm import Session
 from typing import Generator
 from sample_registry.mapping import SampleTable
-from sample_registry.illumina import IlluminaFastq
 from sample_registry.registrar import SampleRegistry
+from seqBackupLib import IlluminaFastq
 
 
 SAMPLES_DESC = """\
@@ -145,7 +145,12 @@ def register_illumina_file(argv=None, session: Session = None, out=sys.stdout):
     registry = SampleRegistry(session)
     f = IlluminaFastq(gzip.open(args.file, "rt"))
     acc = registry.register_run(
-        f.date, f.machine_type, "Nextera XT", f.lane, f.filepath, args.comment
+        f.folder_info["date"],
+        f.machine_type,
+        "Nextera XT",
+        f.lane,
+        f.filepath,
+        args.comment,
     )
 
     registry.session.commit()
