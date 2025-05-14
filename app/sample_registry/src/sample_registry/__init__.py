@@ -4,7 +4,7 @@ from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 
 
 # Doesn't include "NA" because that's what we fill in for missing values
