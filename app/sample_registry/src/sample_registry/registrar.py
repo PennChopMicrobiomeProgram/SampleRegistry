@@ -9,16 +9,11 @@ from sample_registry.models import (
     StandardHostSpecies,
     Run,
 )
+from seqBackupLib.illumina import MACHINE_TYPES
 
 
 class SampleRegistry(object):
-    machines = [
-        "Illumina-MiSeq",
-        "Illumina-HiSeq",
-        "Illumina-NovaSeq",
-        "Illumina-MiniSeq",
-        "Illumina-NextSeq",
-    ]
+    machines = MACHINE_TYPES
     kits = ["Nextera XT"]
 
     def __init__(self, session: Session = None):
