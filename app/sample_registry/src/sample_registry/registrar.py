@@ -13,7 +13,7 @@ from seqBackupLib.illumina import MACHINE_TYPES
 
 
 class SampleRegistry(object):
-    machines = MACHINE_TYPES
+    machines = MACHINE_TYPES.values()
     kits = ["Nextera XT"]
 
     def __init__(self, session: Session = None):
