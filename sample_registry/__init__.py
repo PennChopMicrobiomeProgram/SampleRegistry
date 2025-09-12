@@ -9,7 +9,18 @@ __version__ = "1.3.0"
 
 
 # Doesn't include "NA" because that's what we fill in for missing values
-NULL_VALUES: list[Optional[str]] = [None, "", "null", "NULL", "None", "none", "NONE", "N/A", "n/a", "na"]
+NULL_VALUES: list[Optional[str]] = [
+    None,
+    "",
+    "null",
+    "NULL",
+    "None",
+    "none",
+    "NONE",
+    "N/A",
+    "n/a",
+    "na",
+]
 
 
 def sample_registry_version():
@@ -22,7 +33,9 @@ except KeyError:
     sys.stdout.write(
         "Missing database connection information in environment, using test SQLite database\n"
     )
-    SQLALCHEMY_DATABASE_URI = f"sqlite:///{Path(__file__).parent.parent.resolve()}/sample_registry.sqlite3"
+    SQLALCHEMY_DATABASE_URI = (
+        f"sqlite:///{Path(__file__).parent.parent.resolve()}/sample_registry.sqlite3"
+    )
 
 
 if "PYTEST_VERSION" in os.environ:

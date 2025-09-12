@@ -19,10 +19,10 @@ jobs:
         run: |
           pip install .[dev,web]
       - name: Run tests
-        run: pytest -s -vvvv -l --tb=long app/sample_registry/test
+        run: pytest -s -vvvv -l --tb=long tests
       - name: Generate coverage report
         run: |
-          pytest --cov app/sample_registry/
+          pytest --cov sample_registry
           cp .coverage ../
       - name: "Upload coverage to Codecov"
         uses: codecov/codecov-action@v5
@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.10', '3.11', '3.12', '3.13']
     runs-on: ubuntu-latest
 
     steps:
@@ -44,10 +44,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install project
         run: |
-          python -m pip install app/sample_registry/ pytest pytest-cov
-          python -m pip install -r requirements.txt
+          pip install .[dev,web]
       - name: Run tests
-        run: pytest -s -vvvv -l --tb=long app/sample_registry/test
+        run: pytest -s -vvvv -l --tb=long tests
 
   lint:
     name: Lint Code Base
@@ -60,7 +59,7 @@ jobs:
         with:
           python-version: 3.12
       - name: Install Dependencies
-        run: pip install black
+        run: pip install .[dev]
 
       - name: Lint Code Base
         run: black --check .

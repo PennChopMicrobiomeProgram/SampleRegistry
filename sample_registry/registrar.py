@@ -168,7 +168,9 @@ class SampleRegistry:
 
         return list(samples)
 
-    def register_annotations(self, run_accession: int, sample_table: SampleTable) -> list[tuple[int, str]]:
+    def register_annotations(
+        self, run_accession: int, sample_table: SampleTable
+    ) -> list[tuple[int, str]]:
         accessions = self._get_sample_accessions(run_accession, sample_table)
 
         # Remove existing annotations
@@ -271,9 +273,7 @@ class SampleRegistry:
     def remove_standard_host_species(self):
         self.session.execute(delete(StandardHostSpecies))
 
-    def register_standard_host_species(
-        self, host_species
-    ):
+    def register_standard_host_species(self, host_species):
         self.session.execute(
             insert(StandardHostSpecies).values(
                 [
