@@ -1,13 +1,24 @@
-FROM python:3.12-slim
+FROM python:3.13-slim
+
+# Need `git` to install `tablemusthave` as long as it's not on PyPi
+RUN apt-get clean && apt-get -y update
+RUN apt-get -y --no-install-recommends install curl git vim \
+&& apt-get clean \
+&& rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 COPY . .
 
-RUN apt-get update && apt-get install -y git
+RUN pip install /app/[web]
 
-RUN pip install -r requirements.txt
-RUN pip install /app/app/sample_registry/
+# For the given audience, it's easier to just have it in debug mode
+ENV FLASK_DEBUG=1
+ENV FLASK_APP=/app/sample_registry/app
+ENV SQLALCHEMY_ECHO=True
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV FLASK_RUN_PORT=80
 
-ENTRYPOINT [ "python" ]
-CMD [ "app/app.py" ]
+EXPOSE 80
+
+CMD [ "flask", "run" ]

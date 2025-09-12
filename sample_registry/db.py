@@ -1,11 +1,10 @@
 import csv
-import os
 import sys
+from typing import Optional
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import delete
 from sqlalchemy.orm import sessionmaker
-from . import NULL_VALUES
-from .models import (
+from sample_registry import NULL_VALUES
+from sample_registry.models import (
     Base,
     Run,
     Sample,
@@ -22,10 +21,10 @@ STANDARD_TAGS = {
 }
 
 
-def create_test_db(session: sessionmaker = None):
+def create_test_db(session: Optional[sessionmaker] = None):
     if not session:
-        from . import engine
-        from . import session as imported_session
+        from sample_registry import engine
+        from sample_registry import session as imported_session
 
         session = imported_session
         Base.metadata.create_all(engine)
@@ -204,7 +203,7 @@ def init_standard_host_species(session: sessionmaker):
         session.bulk_save_objects(host_species_list)
 
 
-def query_tag_stats(db: SQLAlchemy, tag: str):
+def query_tag_stats(db: SQLAlchemy, tag: str) -> list[dict]:
     if tag in STANDARD_TAGS.keys():
         return (
             db.session.query(

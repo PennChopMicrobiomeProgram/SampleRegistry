@@ -3,12 +3,13 @@ import sys
 from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from typing import Optional
 
-__version__ = "1.2.3"
+__version__ = "1.3.0"
 
 
 # Doesn't include "NA" because that's what we fill in for missing values
-NULL_VALUES = [None, "", "null", "NULL", "None", "none", "NONE", "N/A", "n/a", "na"]
+NULL_VALUES: list[Optional[str]] = [None, "", "null", "NULL", "None", "none", "NONE", "N/A", "n/a", "na"]
 
 
 def sample_registry_version():

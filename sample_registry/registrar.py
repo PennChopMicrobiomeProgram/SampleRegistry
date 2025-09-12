@@ -1,5 +1,6 @@
-from sqlalchemy import and_, delete, insert, select, update
-from sqlalchemy.orm import Session
+from typing import Optional
+from sqlalchemy import and_, create_engine, delete, insert, select, update
+from sqlalchemy.orm import Session, sessionmaker
 from sample_registry.db import STANDARD_TAGS
 from sample_registry.mapping import SampleTable
 from sample_registry.models import (
@@ -12,13 +13,19 @@ from sample_registry.models import (
 from seqBackupLib.illumina import MACHINE_TYPES
 
 
-class SampleRegistry(object):
+class SampleRegistry:
     machines = MACHINE_TYPES.values()
     kits = ["Nextera XT"]
 
-    def __init__(self, session: Session = None):
-        if session:
+    def __init__(self, session: Optional[Session] = None, uri: Optional[str] = None):
+        if session and uri:
+            raise ValueError("Cannot provide both session and uri")
+        elif session:
             self.session = session
+        elif uri:
+            engine = create_engine(uri, echo=False)
+            SessionLocal = sessionmaker(bind=engine)
+            self.session = SessionLocal()
         else:
             from sample_registry import session as imported_session
 
@@ -56,7 +63,7 @@ class SampleRegistry(object):
         lane: int,
         data_uri: str,
         comment: str,
-    ) -> int:
+    ) -> Optional[int]:
         # Using this because there are situations where the autoincrement is untrustworthy
         max_run_accession = self.session.scalar(
             select(Run.run_accession).order_by(Run.run_accession.desc()).limit(1)
@@ -91,7 +98,7 @@ class SampleRegistry(object):
         if bool(samples) != exists:
             s = "exist" if exists else "don't exist"
             raise ValueError(f"Samples {s} for run {run_accession}")
-        return samples
+        return list(samples)
 
     def register_samples(
         self, run_accession: int, sample_table: SampleTable
@@ -159,9 +166,9 @@ class SampleRegistry(object):
             delete(Sample).where(Sample.run_accession == run_accession)
         )
 
-        return samples
+        return list(samples)
 
-    def register_annotations(self, run_accession: int, sample_table: SampleTable):
+    def register_annotations(self, run_accession: int, sample_table: SampleTable) -> list[tuple[int, str]]:
         accessions = self._get_sample_accessions(run_accession, sample_table)
 
         # Remove existing annotations
@@ -202,7 +209,7 @@ class SampleRegistry(object):
                 )
             )
 
-        return annotation_keys
+        return list(annotation_keys)
 
     def _get_sample_accessions(
         self, run_accession: int, sample_table: SampleTable
@@ -227,7 +234,7 @@ class SampleRegistry(object):
                 unaccessioned_recs.append(rec)
         if unaccessioned_recs:
             raise IOError("Not accessioned: %s" % unaccessioned_recs)
-        return accessions
+        return list(accessions)
 
     def modify_annotation(self, sample_accession: int, key: str, val: str):
         self.session.execute(
@@ -266,7 +273,7 @@ class SampleRegistry(object):
 
     def register_standard_host_species(
         self, host_species
-    ) -> list[tuple[str, str, int]]:
+    ):
         self.session.execute(
             insert(StandardHostSpecies).values(
                 [

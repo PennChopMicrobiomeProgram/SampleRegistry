@@ -11,14 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
-          python-version: 3.12
+          python-version: 3.13
       - name: Install project
         run: |
-          pip install app/sample_registry/ pytest pytest-cov
-          pip install -r requirements.txt
+          pip install .[dev,web]
       - name: Run tests
         run: pytest -s -vvvv -l --tb=long app/sample_registry/test
       - name: Generate coverage report

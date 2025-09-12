@@ -3,11 +3,6 @@ import io
 import itertools
 import os
 
-try:
-    import itertools.izip as zip
-except ImportError:
-    pass
-
 
 def key_by_attr(objs, attr):
     # Cannot use set() here, because objects might not be hashable.
@@ -66,12 +61,12 @@ def parse_fastq(f):
 
 
 class FastaRead(object):
-    def __init__(self, read):
+    def __init__(self, read: tuple[str, str]):
         self.desc, self.seq = read
 
 
 class FastqRead(object):
-    def __init__(self, read):
+    def __init__(self, read: tuple[str, str, str]):
         self.desc, self.seq, self.qual = read
 
 
@@ -102,7 +97,7 @@ AMBIGUOUS_BASES_COMPLEMENT = {
 }
 
 
-def deambiguate(seq):
+def deambiguate(seq: str) -> list[str]:
     nt_choices = [AMBIGUOUS_BASES[x] for x in seq]
     return ["".join(c) for c in itertools.product(*nt_choices)]
 
@@ -115,7 +110,7 @@ COMPLEMENT_BASES = {
 }
 
 
-def reverse_complement(seq):
+def reverse_complement(seq: str) -> str:
     rc = [COMPLEMENT_BASES[x] for x in seq]
     rc.reverse()
     return "".join(rc)

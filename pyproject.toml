@@ -3,7 +3,7 @@ name = "sample_registry"  # Required
 dynamic = ["version"]
 description = "PennCHOP Microbiome Program Sample Registry"  # Optional
 readme = "README.md" # Optional
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
   {name = "Kyle Bittinger", email = "kylebittinger@gmail.com"},
   {name = "Charlie Bushman", email = "ctbushman@gmail.com" } # Optional
@@ -19,7 +19,6 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
 
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -28,18 +27,23 @@ classifiers = [
 ]
 
 dependencies = [
-    "flask",
-    "flask-sqlalchemy",
-    "sqlalchemy",
+    "sqlalchemy~=2.0",
     "seqbackup @ git+https://github.com/PennChopMicrobiomeProgram/seqBackup.git@master",
 ]
 
 [project.optional-dependencies] # Optional
-dev = ["black"]
-test = ["pytest", "pytest-cov"]
+dev = [
+  "black~=25.1",
+  "pytest~=8.4",
+  "pytest-cov~=7.0",
+]
+web = [
+  "flask~=3.1",
+  "flask-sqlalchemy~=3.1",
+]
 
 [project.urls]  # Optional
-"Homepage" = "https://github.com/PennChopMicrobiomeProgram/SampleRegistry/"
+"Homepage" = "https://sampleregistry.tkg.research.chop.edu"
 "Bug Reports" = "https://github.com/PennChopMicrobiomeProgram/SampleRegistry/issues"
 "Source" = "https://github.com/PennChopMicrobiomeProgram/SampleRegistry/"
 
