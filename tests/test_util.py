@@ -1,6 +1,6 @@
 import collections
 import io
-from src.sample_registry.util import (
+from sample_registry.util import (
     key_by_attr,
     dict_from_eav,
     local_filepath,

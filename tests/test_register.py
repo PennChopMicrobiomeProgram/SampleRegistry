@@ -6,9 +6,9 @@ import tempfile
 from sqlalchemy import and_, create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 from typing import Generator
-from src.sample_registry.db import create_test_db
-from src.sample_registry.mapping import SampleTable
-from src.sample_registry.models import (
+from sample_registry.db import create_test_db
+from sample_registry.mapping import SampleTable
+from sample_registry.models import (
     Annotation,
     Base,
     Run,
@@ -16,7 +16,7 @@ from src.sample_registry.models import (
     StandardHostSpecies,
     StandardSampleType,
 )
-from src.sample_registry.register import (
+from sample_registry.register import (
     register_run,
     register_sample_annotations,
     unregister_samples,
