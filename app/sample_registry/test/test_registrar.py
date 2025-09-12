@@ -53,6 +53,18 @@ def test_check_run_accession(db):
     assert registry.check_run_accession(1).run_accession == 1
 
 
+def test_get_run(db):
+    registry = SampleRegistry(db)
+    run = registry.get_run(1)
+    assert run.run_accession == 1
+    assert run.run_date == "2024-07-02"
+
+
+def test_get_run_doesnt_exist(db):
+    registry = SampleRegistry(db)
+    assert registry.get_run(9999) is None
+
+
 def test_check_run_accession_doesnt_exist(db):
     registry = SampleRegistry(db)
     with pytest.raises(ValueError):
