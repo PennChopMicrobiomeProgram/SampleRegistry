@@ -62,6 +62,9 @@ export_samples = "sample_registry.export:export_samples"
 create_test_db = "sample_registry.db:create_test_db"
 sample_registry_version = "sample_registry:sample_registry_version"
 
+[tool.setuptools]
+packages = ["sample_registry"]
+
 [tool.setuptools.package-data]
 "sample_registry" = [
     "templates/*.html",

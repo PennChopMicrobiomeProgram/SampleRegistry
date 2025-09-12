@@ -55,6 +55,20 @@ class SampleRegistry:
             select(Run).where(Run.run_accession == run_accession)
         )
 
+    def get_samples(self, run_accession: int) -> list[Sample]:
+        """Return the list of ``Sample`` records for ``run_accession``.
+
+        Parameters
+        ----------
+        run_accession:
+            Accession number identifying the sequencing run.
+        """
+        return list(
+            self.session.scalars(
+                select(Sample).where(Sample.run_accession == run_accession)
+            ).all()
+        )
+
     def register_run(
         self,
         run_date: str,

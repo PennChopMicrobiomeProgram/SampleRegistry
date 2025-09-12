@@ -16,11 +16,10 @@ git clone https://github.com/PennChopMicrobiomeProgram/SampleRegistry.git
 cd SampleRegistry
 python -m venv env/
 source env/bin/activate
-pip install -r requirements.txt
-pip install app/sample_registry
+pip install -e .[dev,web]
 
 create_test_db
-export FLASK_DEBUG=1 && flask --app app/app run
+python sample_registry/app.py
 ```
 
 ## Deployment
