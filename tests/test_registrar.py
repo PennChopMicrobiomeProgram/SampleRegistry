@@ -2,9 +2,9 @@ from typing import Generator
 import pytest
 from sqlalchemy import create_engine, func, select
 from sqlalchemy.orm import Session, sessionmaker
-from src.sample_registry.db import create_test_db
-from src.sample_registry.mapping import SampleTable
-from src.sample_registry.models import (
+from sample_registry.db import create_test_db
+from sample_registry.mapping import SampleTable
+from sample_registry.models import (
     Annotation,
     Base,
     Run,
@@ -12,7 +12,7 @@ from src.sample_registry.models import (
     StandardHostSpecies,
     StandardSampleType,
 )
-from src.sample_registry.registrar import SampleRegistry
+from sample_registry.registrar import SampleRegistry
 
 recs = [
     {

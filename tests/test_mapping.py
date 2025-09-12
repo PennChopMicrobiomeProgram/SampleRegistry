@@ -1,5 +1,5 @@
 import io
-from src.sample_registry.mapping import SampleTable
+from sample_registry.mapping import SampleTable
 
 
 NORMAL_TSV = """\
