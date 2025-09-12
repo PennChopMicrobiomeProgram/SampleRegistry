@@ -30,6 +30,24 @@ class SampleRegistry(object):
             raise ValueError("Run does not exist %s" % acc)
         return run
 
+    def get_run(self, run_accession: int) -> Run | None:
+        """Return the ``Run`` record for ``run_accession``.
+
+        Parameters
+        ----------
+        run_accession:
+            Accession number identifying the sequencing run.
+
+        Returns
+        -------
+        Run | None
+            The ``Run`` instance if found, otherwise ``None``.
+        """
+
+        return self.session.scalar(
+            select(Run).where(Run.run_accession == run_accession)
+        )
+
     def register_run(
         self,
         run_date: str,
