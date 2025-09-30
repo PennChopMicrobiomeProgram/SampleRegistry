@@ -55,6 +55,29 @@ class SampleRegistry:
             select(Run).where(Run.run_accession == run_accession)
         )
 
+    def get_runs_by_data_uri(self, substring: str) -> list[int]:
+        """Return run accessions whose ``data_uri`` contains ``substring``.
+
+        Parameters
+        ----------
+        substring:
+            Text that must be contained within the ``data_uri`` field.
+
+        Returns
+        -------
+        list[int]
+            Run accessions ordered ascending for runs whose ``data_uri``
+            contains ``substring``.
+        """
+
+        return list(
+            self.session.scalars(
+                select(Run.run_accession)
+                .where(Run.data_uri.contains(substring))
+                .order_by(Run.run_accession)
+            ).all()
+        )
+
     def get_samples(self, run_accession: int) -> list[Sample]:
         """Return the list of ``Sample`` records for ``run_accession``.
 
