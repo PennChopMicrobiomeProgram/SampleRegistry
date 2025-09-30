@@ -65,6 +65,13 @@ def test_get_run_doesnt_exist(db):
     assert registry.get_run(9999) is None
 
 
+def test_get_runs_by_data_uri(db):
+    registry = SampleRegistry(db)
+    assert registry.get_runs_by_data_uri("run1") == [1]
+    assert registry.get_runs_by_data_uri("raw_data") == [1, 2, 3]
+    assert registry.get_runs_by_data_uri("not-a-uri") == []
+
+
 def test_check_run_accession_doesnt_exist(db):
     registry = SampleRegistry(db)
     with pytest.raises(ValueError):
