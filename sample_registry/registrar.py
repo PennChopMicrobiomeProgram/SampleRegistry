@@ -92,6 +92,13 @@ class SampleRegistry:
             ).all()
         )
 
+    def get_annotations(self, sample_accession: int) -> list[Annotation]:
+        return list(
+            self.session.scalars(
+                select(Annotation).where(Annotation.sample_accession == sample_accession)
+            ).all()
+        )
+
     def register_run(
         self,
         run_date: str,
@@ -323,3 +330,4 @@ class SampleRegistry:
                 ]
             )
         )
+
