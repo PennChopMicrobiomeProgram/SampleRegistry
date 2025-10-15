@@ -95,7 +95,9 @@ class SampleRegistry:
     def get_annotations(self, sample_accession: int) -> list[Annotation]:
         return list(
             self.session.scalars(
-                select(Annotation).where(Annotation.sample_accession == sample_accession)
+                select(Annotation).where(
+                    Annotation.sample_accession == sample_accession
+                )
             ).all()
         )
 
@@ -330,4 +332,3 @@ class SampleRegistry:
                 ]
             )
         )
-
