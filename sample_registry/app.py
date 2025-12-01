@@ -39,7 +39,8 @@ db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
 with app.app_context():
-    db.create_all()
+    if "mode=ro" not in SQLALCHEMY_DATABASE_URI:
+        db.create_all()
 
 
 @app.route("/favicon.ico")

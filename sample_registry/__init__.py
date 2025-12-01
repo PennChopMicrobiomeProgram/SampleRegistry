@@ -33,9 +33,8 @@ except KeyError:
     sys.stdout.write(
         "Missing database connection information in environment, using test SQLite database\n"
     )
-    SQLALCHEMY_DATABASE_URI = (
-        f"sqlite:///{Path(__file__).parent.parent.resolve()}/sample_registry.sqlite3"
-    )
+    db_path = Path(__file__).parent.parent.resolve() / "sample_registry.sqlite3"
+    SQLALCHEMY_DATABASE_URI = f"sqlite:///file:{db_path}?mode=ro&uri=true"
 
 
 if "PYTEST_VERSION" in os.environ:
