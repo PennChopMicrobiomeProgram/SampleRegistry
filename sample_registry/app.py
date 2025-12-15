@@ -1,6 +1,8 @@
 import csv
 import pickle
 import os
+from collections import defaultdict
+from datetime import datetime
 from flask import (
     Flask,
     make_response,
@@ -10,6 +12,7 @@ from flask import (
     redirect,
     send_file,
     send_from_directory,
+    jsonify,
 )
 from flask_sqlalchemy import SQLAlchemy
 from io import StringIO
@@ -37,6 +40,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
 print(SQLALCHEMY_DATABASE_URI)
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
+
+ARCHIVE_ROOT = Path("/mnt/isilon/microbiome/")
 
 with app.app_context():
     db.create_all()
@@ -292,6 +297,72 @@ def show_stats():
         num_samples_with_primer=num_samples_with_primer,
         num_samples_with_reverse_primer=num_samples_with_reverse_primer,
     )
+
+
+def _parsed_month(date_str: str):
+    for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%m/%d/%y", "%m/%d/%Y"):
+        try:
+            return datetime.strptime(date_str, fmt).strftime("%Y-%m")
+        except ValueError:
+            continue
+    return None
+
+
+def _archive_size_for_run(run, warnings):
+    archive_path = (ARCHIVE_ROOT / run.data_uri).parent
+    run_label = f"CMR{run.run_accession:06d}"
+
+    if not archive_path.exists():
+        warnings.append(f"{run_label}: Archive path {archive_path} does not exist")
+        return 0
+
+    if not archive_path.is_dir():
+        warnings.append(f"{run_label}: Archive path {archive_path} is not a directory")
+        return 0
+
+    total_size = 0
+    for entry in archive_path.rglob("*"):
+        try:
+            if entry.is_file():
+                total_size += entry.stat().st_size
+        except OSError as exc:
+            warnings.append(f"{run_label}: Error accessing {entry}: {exc}")
+
+    if total_size == 0:
+        warnings.append(f"{run_label}: Archive at {archive_path} has size 0 bytes")
+
+    return total_size
+
+
+@app.route("/api/archive_sizes")
+def archive_sizes():
+    runs = db.session.query(Run).all()
+    warnings = []
+    totals_by_month = defaultdict(int)
+
+    for run in runs:
+        month_label = _parsed_month(run.run_date)
+        if not month_label:
+            warnings.append(
+                f"CMR{run.run_accession:06d}: Unable to parse run_date '{run.run_date}'"
+            )
+
+        archive_size = _archive_size_for_run(run, warnings)
+
+        if month_label:
+            totals_by_month[month_label] += archive_size
+
+    by_month = [
+        {"month": month, "size_bytes": totals_by_month[month]}
+        for month in sorted(totals_by_month.keys())
+    ]
+
+    return jsonify({"by_month": by_month, "warnings": warnings})
+
+
+@app.route("/archive")
+def archive():
+    return render_template("archive.html")
 
 
 @app.route("/download/<run_acc>", methods=["GET", "POST"])
