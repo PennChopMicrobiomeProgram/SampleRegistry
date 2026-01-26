@@ -46,13 +46,9 @@ if "PYTEST_VERSION" in os.environ:
     # Set SQLALCHEMY_DATABASE_URI to an in-memory SQLite database for testing
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
 
-SQLALCHEMY_DATABASE_URI = f"{SQLALCHEMY_DATABASE_URI.split('?')[0]}?mode=ro"
+
 sys.stderr.write(f"Connecting to database at {SQLALCHEMY_DATABASE_URI}\n")
-# The 'check_same_thread': False argument is often necessary for SQLite with SQLAlchemy
-# in multi-threaded environments (like web apps).
-connection_args = {"check_same_thread": False}
-# Construct the read-only engine
-engine = create_engine(SQLALCHEMY_DATABASE_URI, connect_args=connection_args)
+engine = create_engine(SQLALCHEMY_DATABASE_URI)
 
 # Create database session
 Session = sessionmaker(bind=engine)

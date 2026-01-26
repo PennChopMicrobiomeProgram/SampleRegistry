@@ -19,7 +19,7 @@
             <li><strong>Date:</strong> {{ run.run_date }}</li>
             <li><strong>Lane:</strong> {{ run.lane }}</li>
             <li><strong>Platform:</strong> {{ run.machine_type }} {{ run.machine_kit }}</li>
-            <li><strong>Data file:</strong> <a href="/mnt/isilon/microbiome/{{ run.data_uri }}">{{ run.data_uri }}</a></li>
+            <li><strong>Data file:</strong> /mnt/isilon/microbiome/{{ run.data_uri }}</li>
             </ul>
             <p>
             <strong>Export metadata for all samples:</strong><br />
