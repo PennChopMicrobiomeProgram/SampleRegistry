@@ -42,7 +42,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
 print(SQLALCHEMY_DATABASE_URI)
 # Ensure SQLite explicitly opens in read-only mode
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"connect_args": {"uri": True}}
-
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
@@ -338,19 +337,23 @@ def _archive_size_for_run(run, warnings):
 def archive_sizes():
     runs = db.session.query(Run).all()
     warnings = []
+    max_warnings = 50
     totals_by_month = defaultdict(int)
 
     for run in runs:
         month_label = _parsed_month(run.run_date)
         if not month_label:
-            warnings.append(
-                f"CMR{run.run_accession:06d}: Unable to parse run_date '{run.run_date}'"
-            )
+            if len(warnings) < max_warnings:
+                warnings.append(
+                    f"CMR{run.run_accession:06d}: Unable to parse run_date '{run.run_date}'"
+                )
+            continue
 
         archive_size = _archive_size_for_run(run, warnings)
+        totals_by_month[month_label] += archive_size
 
-        if month_label:
-            totals_by_month[month_label] += archive_size
+    if len(warnings) >= max_warnings:
+        warnings.append("... Additional warnings truncated ...")
 
     by_month = [
         {"month": month, "size_bytes": totals_by_month[month]}
