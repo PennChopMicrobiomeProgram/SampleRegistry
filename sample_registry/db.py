@@ -13,7 +13,6 @@ from sample_registry.models import (
     StandardHostSpecies,
 )
 
-
 STANDARD_TAGS = {
     "SampleType": "sample_type",
     "SubjectID": "subject_id",
