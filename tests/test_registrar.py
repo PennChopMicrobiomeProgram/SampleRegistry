@@ -9,8 +9,6 @@ from sample_registry.models import (
     Base,
     Run,
     Sample,
-    StandardHostSpecies,
-    StandardSampleType,
 )
 from sample_registry.registrar import SampleRegistry
 
@@ -185,31 +183,3 @@ def test_modify_annotation(db):
     )
 
 
-def test_register_standard_sample_types(db):
-    registry = SampleRegistry(db)
-    registry.register_standard_sample_types([("type1", "common", False, "NA")])
-    assert db.scalar(
-        select(StandardSampleType).where(StandardSampleType.sample_type == "type1")
-    )
-
-
-def test_remove_standard_sample_types(db):
-    registry = SampleRegistry(db)
-    registry.remove_standard_sample_types()
-    assert not db.scalar(select(StandardSampleType))
-
-
-def test_register_standard_host_species(db):
-    registry = SampleRegistry(db)
-    registry.register_standard_host_species([("species1", "Species specius", 1)])
-    assert db.scalar(
-        select(StandardHostSpecies).where(
-            StandardHostSpecies.host_species == "species1"
-        )
-    )
-
-
-def test_remove_standard_host_species(db):
-    registry = SampleRegistry(db)
-    registry.remove_standard_host_species()
-    assert not db.scalar(select(StandardHostSpecies))

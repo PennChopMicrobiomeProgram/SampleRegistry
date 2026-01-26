@@ -4,7 +4,6 @@ import argparse
 import sys
 import gzip
 from sqlalchemy.orm import Session
-from typing import Generator
 from sample_registry.mapping import SampleTable
 from sample_registry.registrar import SampleRegistry
 from seqBackupLib.illumina import IlluminaFastq
@@ -83,52 +82,6 @@ def register_sample_annotations(
     if register_samples:
         registry.register_samples(args.run_accession, sample_table)
     registry.register_annotations(args.run_accession, sample_table)
-
-    registry.session.commit()
-
-
-def parse_tsv_ncol(f, ncol: int) -> Generator[tuple[str], None, None]:
-    assert ncol > 0
-    # Skip header
-    next(f)
-    for line in f:
-        line = line.rstrip("\n")
-        if line.startswith("#"):
-            continue
-        if not line.strip():
-            continue
-        vals = line.split("\t")
-        if len(vals) < ncol:
-            raise ValueError("Each line must contain at least {0} fields".format(ncol))
-        yield tuple(vals[:ncol])
-
-
-def register_sample_types(argv=None, session: Session = None):
-    p = argparse.ArgumentParser(
-        description=("Update the list of standard sample types in the registry")
-    )
-    p.add_argument("file", type=argparse.FileType("r"))
-    args = p.parse_args(argv)
-
-    registry = SampleRegistry(session)
-    sample_types = list(parse_tsv_ncol(args.file, 4))
-    registry.remove_standard_sample_types()
-    registry.register_standard_sample_types(sample_types)
-
-    registry.session.commit()
-
-
-def register_host_species(argv=None, session: Session = None):
-    p = argparse.ArgumentParser(
-        description=("Update the list of standard host species in the registry")
-    )
-    p.add_argument("file", type=argparse.FileType("r"))
-    args = p.parse_args(argv)
-
-    registry = SampleRegistry(session)
-    host_species = list(parse_tsv_ncol(args.file, 3))
-    registry.remove_standard_host_species()
-    registry.register_standard_host_species(host_species)
 
     registry.session.commit()
 

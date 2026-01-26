@@ -49,22 +49,3 @@ class Annotation(Base):
         return f"Annotation(sample_accession={self.sample_accession}, key={self.key}, val={self.val})"
 
 
-class StandardSampleType(Base):
-    __tablename__ = "standard_sample_types"
-    sample_type: Mapped[str] = mapped_column(primary_key=True)
-    rarity: Mapped[str]
-    host_associated: Mapped[bool]
-    comment: Mapped[Optional[str]] = mapped_column(nullable=True)
-
-    def __repr__(self):
-        return f"StandardSampleType(sample_type={self.sample_type}, rarity={self.rarity}, host_associated={self.host_associated}, comment={self.comment})"
-
-
-class StandardHostSpecies(Base):
-    __tablename__ = "standard_host_species"
-    host_species: Mapped[str] = mapped_column(primary_key=True)
-    scientific_name: Mapped[str]
-    ncbi_taxon_id: Mapped[int]
-
-    def __repr__(self):
-        return f"StandardHostSpecies(host_species={self.host_species}, scientific_name={self.scientific_name}, ncbi_taxon_id={self.ncbi_taxon_id})"

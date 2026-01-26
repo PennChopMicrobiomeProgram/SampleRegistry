@@ -1,4 +1,3 @@
-import csv
 import sys
 from typing import Optional
 from flask_sqlalchemy import SQLAlchemy
@@ -9,8 +8,6 @@ from sample_registry.models import (
     Run,
     Sample,
     Annotation,
-    StandardSampleType,
-    StandardHostSpecies,
 )
 
 STANDARD_TAGS = {
@@ -125,81 +122,7 @@ def create_test_db(session: Optional[sessionmaker] = None):
     ]
     session.bulk_save_objects(annotations)
 
-    try:
-        init_standard_sample_types(session)
-    except FileNotFoundError:
-        session.add(
-            StandardSampleType(
-                sample_type="Stool",
-                rarity="Uncommon",
-                host_associated=True,
-                comment="Poo",
-            )
-        )
-        session.add(
-            StandardSampleType(
-                sample_type="Blood",
-                rarity="Common",
-                host_associated=True,
-                comment="Red stuff",
-            )
-        )
-
-    try:
-        init_standard_host_species(session)
-    except FileNotFoundError:
-        session.add(
-            StandardHostSpecies(
-                host_species="Human", scientific_name="Person", ncbi_taxon_id=1
-            )
-        )
-        session.add(
-            StandardHostSpecies(
-                host_species="Mouse", scientific_name="FurryLittleDude", ncbi_taxon_id=2
-            )
-        )
-
     session.commit()
-
-
-def init_standard_sample_types(session: sessionmaker):
-    with open("standard_sample_types.tsv", "r") as file:
-        reader = csv.reader(file, delimiter="\t")
-        next(reader)  # Skip header row
-        sample_types = []
-        for row in reader:
-            sample_type = row[0]
-            rarity = row[1]
-            host_associated = bool(row[2])
-            comment = row[3]
-            sample_types.append(
-                StandardSampleType(
-                    sample_type=sample_type,
-                    rarity=rarity,
-                    host_associated=host_associated,
-                    comment=comment,
-                )
-            )
-        session.bulk_save_objects(sample_types)
-
-
-def init_standard_host_species(session: sessionmaker):
-    with open("standard_host_species.tsv", "r") as file:
-        reader = csv.reader(file, delimiter="\t")
-        next(reader)  # Skip header row
-        host_species_list = []
-        for row in reader:
-            host_species = row[0]
-            scientific_name = row[1]
-            ncbi_taxon_id = row[2]
-            host_species_list.append(
-                StandardHostSpecies(
-                    host_species=host_species,
-                    scientific_name=scientific_name,
-                    ncbi_taxon_id=ncbi_taxon_id,
-                )
-            )
-        session.bulk_save_objects(host_species_list)
 
 
 def query_tag_stats(db: SQLAlchemy, tag: str) -> list[dict]:

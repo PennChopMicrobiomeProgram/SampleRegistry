@@ -1,0 +1,8 @@
+prefix	machine_type
+VH	Illumina-NextSeq
+D	Illumina-HiSeq
+M	Illumina-MiSeq
+A	Illumina-NovaSeq
+NB	Illumina-MiniSeq
+LH	Illumina-NovaSeqX
+SH	Illumina-MiSeq

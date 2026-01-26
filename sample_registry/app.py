@@ -18,15 +18,9 @@ from flask_sqlalchemy import SQLAlchemy
 from io import StringIO
 from pathlib import Path
 from sample_registry import ARCHIVE_ROOT, SQLALCHEMY_DATABASE_URI
-from sample_registry.models import (
-    Base,
-    Annotation,
-    Run,
-    Sample,
-    StandardHostSpecies,
-    StandardSampleType,
-)
+from sample_registry.models import Base, Annotation, Run, Sample
 from sample_registry.db import run_to_dataframe, query_tag_stats, STANDARD_TAGS
+from sample_registry.standards import STANDARD_HOST_SPECIES, STANDARD_SAMPLE_TYPES
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
@@ -192,37 +186,44 @@ def show_runs(run_acc=None):
 
 @app.route("/stats")
 def show_stats():
+    standard_sampletypes = set(STANDARD_SAMPLE_TYPES.names())
+    standard_hostspecies = set(STANDARD_HOST_SPECIES.names())
+
     num_samples = db.session.query(Sample).count()
     num_samples_with_sampletype = (
         db.session.query(Sample).filter(Sample.sample_type is not None).count()
     )
     num_samples_with_standard_sampletype = (
         db.session.query(Sample)
-        .join(StandardSampleType, Sample.sample_type == StandardSampleType.sample_type)
+        .filter(Sample.sample_type.in_(standard_sampletypes))
         .count()
+        if standard_sampletypes
+        else 0
     )
     standard_sampletype_counts = (
-        db.session.query(
-            StandardSampleType.sample_type,
-            db.func.count(Sample.sample_accession),
-            StandardSampleType.host_associated,
-        )
-        .join(Sample, Sample.sample_type == StandardSampleType.sample_type)
-        .group_by(StandardSampleType.sample_type)
-        .order_by(
-            db.func.count(Sample.sample_accession).desc(),
-            StandardSampleType.sample_type,
-        )
+        db.session.query(Sample.sample_type, db.func.count(Sample.sample_accession))
+        .filter(Sample.sample_type.in_(standard_sampletypes))
+        .group_by(Sample.sample_type)
+        .order_by(db.func.count(Sample.sample_accession).desc(), Sample.sample_type)
         .all()
-    )
-    standard_sampletypes = set(
-        s.sample_type for s in db.session.query(StandardSampleType.sample_type).all()
+        if standard_sampletypes
+        else []
     )
     nonstandard_sampletype_counts = (
         db.session.query(Sample.sample_type, db.func.count(Sample.sample_accession))
-        .filter(Sample.sample_type.notin_(standard_sampletypes))
+        .filter(
+            Sample.sample_type.isnot(None),
+            Sample.sample_type.notin_(standard_sampletypes),
+        )
         .group_by(Sample.sample_type)
         .order_by(db.func.count(Sample.sample_accession).desc(), Sample.sample_type)
+        .all()
+        if standard_sampletypes
+        else db.session.query(Sample.sample_type, db.func.count(Sample.sample_accession))
+        .filter(Sample.sample_type.isnot(None))
+        .group_by(Sample.sample_type)
+        .order_by(db.func.count(Sample.sample_accession).desc(), Sample.sample_type)
+        .all()
     )
 
     num_subjectid = (
@@ -241,33 +242,35 @@ def show_stats():
     )
     num_samples_with_standard_hostspecies = (
         db.session.query(Sample)
-        .join(
-            StandardHostSpecies, Sample.host_species == StandardHostSpecies.host_species
-        )
+        .filter(Sample.host_species.in_(standard_hostspecies))
         .count()
+        if standard_hostspecies
+        else 0
     )
     standard_hostspecies_counts = (
-        db.session.query(
-            StandardHostSpecies.host_species,
-            db.func.count(Sample.sample_accession),
-            StandardHostSpecies.ncbi_taxon_id,
-        )
-        .join(Sample, Sample.host_species == StandardHostSpecies.host_species)
-        .group_by(StandardHostSpecies.host_species)
-        .order_by(
-            db.func.count(Sample.sample_accession).desc(),
-            StandardHostSpecies.host_species,
-        )
+        db.session.query(Sample.host_species, db.func.count(Sample.sample_accession))
+        .filter(Sample.host_species.in_(standard_hostspecies))
+        .group_by(Sample.host_species)
+        .order_by(db.func.count(Sample.sample_accession).desc(), Sample.host_species)
         .all()
-    )
-    standard_hostspecies = set(
-        s.host_species for s in db.session.query(StandardHostSpecies.host_species).all()
+        if standard_hostspecies
+        else []
     )
     nonstandard_hostspecies_counts = (
         db.session.query(Sample.host_species, db.func.count(Sample.sample_accession))
-        .filter(Sample.host_species.notin_(standard_hostspecies))
+        .filter(
+            Sample.host_species.isnot(None),
+            Sample.host_species.notin_(standard_hostspecies),
+        )
         .group_by(Sample.host_species)
         .order_by(db.func.count(Sample.sample_accession).desc(), Sample.host_species)
+        .all()
+        if standard_hostspecies
+        else db.session.query(Sample.host_species, db.func.count(Sample.sample_accession))
+        .filter(Sample.host_species.isnot(None))
+        .group_by(Sample.host_species)
+        .order_by(db.func.count(Sample.sample_accession).desc(), Sample.host_species)
+        .all()
     )
 
     num_samples_with_primer = (
