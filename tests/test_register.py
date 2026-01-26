@@ -25,7 +25,6 @@ from sample_registry.register import (
     register_host_species,
 )
 
-
 samples = [
     {
         "SampleID": "abc123",

@@ -8,6 +8,10 @@ from typing import Optional
 __version__ = "1.3.0"
 
 
+# Define archive root path
+ARCHIVE_ROOT = Path(
+    os.environ.get("SAMPLE_REGISTRY_ARCHIVE_ROOT", "/mnt/isilon/microbiome/")
+)
 # Doesn't include "NA" because that's what we fill in for missing values
 NULL_VALUES: list[Optional[str]] = [
     None,
@@ -42,6 +46,9 @@ if "PYTEST_VERSION" in os.environ:
     # Set SQLALCHEMY_DATABASE_URI to an in-memory SQLite database for testing
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
 
+# Put guardrails on db connection
+SQLALCHEMY_DATABASE_URI = f"{SQLALCHEMY_DATABASE_URI.split('?')[0]}?mode=ro&uri=true"
+sys.stderr.write(f"Connecting to database at {SQLALCHEMY_DATABASE_URI}\n")
 # Create database engine
 engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=False)
 

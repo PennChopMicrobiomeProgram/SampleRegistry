@@ -9,7 +9,6 @@ from sample_registry.mapping import SampleTable
 from sample_registry.registrar import SampleRegistry
 from seqBackupLib.illumina import IlluminaFastq
 
-
 SAMPLES_DESC = """\
 Add new samples to the registry, with annotations.
 """

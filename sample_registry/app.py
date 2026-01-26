@@ -17,7 +17,7 @@ from flask import (
 from flask_sqlalchemy import SQLAlchemy
 from io import StringIO
 from pathlib import Path
-from sample_registry import SQLALCHEMY_DATABASE_URI
+from sample_registry import ARCHIVE_ROOT, SQLALCHEMY_DATABASE_URI
 from sample_registry.models import (
     Base,
     Annotation,
@@ -40,11 +40,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
 print(SQLALCHEMY_DATABASE_URI)
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
-
-ARCHIVE_ROOT = Path("/mnt/isilon/microbiome/")
-
-with app.app_context():
-    db.create_all()
 
 
 @app.route("/favicon.ico")
