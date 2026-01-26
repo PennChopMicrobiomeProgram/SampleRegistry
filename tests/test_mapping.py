@@ -1,7 +1,6 @@
 import io
 from sample_registry.mapping import SampleTable
 
-
 NORMAL_TSV = """\
 SampleID	BarcodeSequence	HostSpecies	SubjectID
 S1	GCCT	Human	Hu23
