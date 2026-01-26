@@ -52,10 +52,7 @@ sys.stderr.write(f"Connecting to database at {SQLALCHEMY_DATABASE_URI}\n")
 # in multi-threaded environments (like web apps).
 connection_args = {"check_same_thread": False}
 # Construct the read-only engine
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URI,
-    connect_args=connection_args
-)
+engine = create_engine(SQLALCHEMY_DATABASE_URI, connect_args=connection_args)
 
 # Create database session
 Session = sessionmaker(bind=engine)
