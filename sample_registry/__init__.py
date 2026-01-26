@@ -8,6 +8,10 @@ from typing import Optional
 __version__ = "1.3.0"
 
 
+# Define archive root path
+ARCHIVE_ROOT = Path(
+    os.environ.get("SAMPLE_REGISTRY_ARCHIVE_ROOT", "/mnt/isilon/microbiome/")
+)
 # Doesn't include "NA" because that's what we fill in for missing values
 NULL_VALUES: list[Optional[str]] = [
     None,
@@ -34,7 +38,7 @@ except KeyError:
         "Missing database connection information in environment, using test SQLite database\n"
     )
     SQLALCHEMY_DATABASE_URI = (
-        f"sqlite:///{Path(__file__).parent.parent.resolve()}/sample_registry.sqlite3"
+        f"sqlite:///{Path(__file__).parent.parent.resolve()}/sample_registry.sqlite"
     )
 
 
@@ -42,8 +46,9 @@ if "PYTEST_VERSION" in os.environ:
     # Set SQLALCHEMY_DATABASE_URI to an in-memory SQLite database for testing
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
 
-# Create database engine
-engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=False)
+
+sys.stderr.write(f"Connecting to database at {SQLALCHEMY_DATABASE_URI}\n")
+engine = create_engine(SQLALCHEMY_DATABASE_URI)
 
 # Create database session
 Session = sessionmaker(bind=engine)

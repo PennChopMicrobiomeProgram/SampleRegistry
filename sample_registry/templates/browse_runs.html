@@ -20,12 +20,7 @@
     </thead>
     <tbody>
   {% for run, sample_count in sample_counts.items() %}
-      {% if run.machine_type.startswith('Illumina') %}
-          {% set platform = 'Illumina' %}
-      {% else %}
-          {% set platform = run.machine_type %}
-      {% endif %}
-      {% set platform = platform + ' ' + run.machine_kit %}
+      {% set platform = run.machine_type + ' ' + run.machine_kit %}
       <tr>
         <td><a href="{{ url_for('show_runs', run_acc=run.run_accession) }}">{{ "CMR{:06d}".format(run.run_accession) }}</a></td>
         <td><span class="date">{{ run.run_date }}</span></td>

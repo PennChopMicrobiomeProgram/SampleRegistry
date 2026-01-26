@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" integrity="sha256-SERKgtTty1vsDxll+qzd4Y2cF9swY9BCq62i9wXJ9Uo=" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2>Archive usage</h2>
+      <p class="text-muted">Net archive size grouped by month. Data are gathered directly from the NFS archive paths for each run.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <canvas id="archiveChart" aria-label="Archive usage chart" role="img"></canvas>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="col-12">
+      <p>
+        <button class="btn btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#warningsCollapse" aria-expanded="true" aria-controls="warningsCollapse">
+          Warnings
+        </button>
+      </p>
+      <div class="collapse show" id="warningsCollapse">
+        <ul id="warningsList" class="list-group list-group-flush border rounded"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const chartElement = document.getElementById('archiveChart');
+const warningsList = document.getElementById('warningsList');
+
+function renderWarnings(warnings) {
+  warningsList.innerHTML = '';
+  if (!warnings || warnings.length === 0) {
+    const item = document.createElement('li');
+    item.className = 'list-group-item text-muted';
+    item.textContent = 'No warnings to display.';
+    warningsList.appendChild(item);
+    return;
+  }
+
+  warnings.forEach((warning) => {
+    const item = document.createElement('li');
+    item.className = 'list-group-item';
+    item.textContent = warning;
+    warningsList.appendChild(item);
+  });
+}
+
+function renderChart(byMonth) {
+  const labels = byMonth.map((entry) => entry.month);
+  const data = byMonth.map((entry) => entry.size_bytes / (1024 * 1024 * 1024));
+
+  new Chart(chartElement.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Archive size (GB)',
+          data,
+          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Size (GB)',
+          },
+        },
+      },
+    },
+  });
+}
+
+fetch('/api/archive_sizes')
+  .then((response) => response.json())
+  .then(({ by_month: byMonth, warnings }) => {
+    renderChart(byMonth);
+    renderWarnings(warnings);
+  })
+  .catch((error) => {
+    renderWarnings([`Error loading archive data: ${error}`]);
+  });
+</script>
+{% endblock %}
