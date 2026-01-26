@@ -38,7 +38,7 @@ except KeyError:
         "Missing database connection information in environment, using test SQLite database\n"
     )
     SQLALCHEMY_DATABASE_URI = (
-        f"sqlite:///{Path(__file__).parent.parent.resolve()}/sample_registry.sqlite3"
+        f"sqlite:///{Path(__file__).parent.parent.resolve()}/sample_registry.sqlite"
     )
 
 
@@ -46,11 +46,16 @@ if "PYTEST_VERSION" in os.environ:
     # Set SQLALCHEMY_DATABASE_URI to an in-memory SQLite database for testing
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
 
-# Put guardrails on db connection
-SQLALCHEMY_DATABASE_URI = f"{SQLALCHEMY_DATABASE_URI.split('?')[0]}?mode=ro&uri=true"
+SQLALCHEMY_DATABASE_URI = f"{SQLALCHEMY_DATABASE_URI.split('?')[0]}?mode=ro"
 sys.stderr.write(f"Connecting to database at {SQLALCHEMY_DATABASE_URI}\n")
-# Create database engine
-engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=False)
+# The 'check_same_thread': False argument is often necessary for SQLite with SQLAlchemy
+# in multi-threaded environments (like web apps).
+connection_args = {"check_same_thread": False}
+# Construct the read-only engine
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URI,
+    connect_args=connection_args
+)
 
 # Create database session
 Session = sessionmaker(bind=engine)
