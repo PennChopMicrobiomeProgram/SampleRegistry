@@ -1,4 +1,5 @@
 host_species	scientific_name	ncbi_taxid
+Cow	Bos taurus	9913
 Dog	Canis lupus familiaris	9615
 Fruit fly	Drosophila melanogaster	7227
 Human	Homo sapiens	9606
@@ -9,5 +10,4 @@ Pigeon	Columba livia	8932
 Rabbit	Oryctolagus cuniculus	9986
 Rat	Rattus norvegicus	10116
 Rhesus macaque	Macaca mulatta	9544
-Cow	Bos taurus	9913
 Sheep	Ovis aries	9940

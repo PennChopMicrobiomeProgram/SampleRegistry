@@ -7,13 +7,16 @@ Bioreactor	Uncommon	0	NA
 Blank swab	Common	0	Swab taken out of packaging in sequencing lab immediately before extraction.
 Blood	Uncommon	1	NA
 Breast milk	Rare	1	NA
-Buffer	Uncommon	0	NA
+Buffer
+Cecal content	Uncommon	0	NA
 Cecum	Uncommon	1	NA
 Cell lysate	Uncommon	1	NA
 Cervical swab	Rare	1	NA
 Cheek swab	Uncommon	1	NA
 Crop	Rare	1	NA
-Dental plaque	Uncommon	1	NA
+Dental plaque
+Dental suture
+DNA-free water	Uncommon	1	NA
 Duodenum	Rare	1	NA
 Dust	Uncommon	0	NA
 Elution buffer	Common	0	NA
@@ -31,7 +34,9 @@ Fruit fly	Rare	1	NA
 Ileostomy fluid	Uncommon	1	NA
 Ileum	Uncommon	1	NA
 Kveim reagent	Uncommon	0	NA
-Lab water	Uncommon	0	NA
+Lab water
+Large intestine mucosa	Common	1	"NA"
+Large intestine lumen	Common	1	"NA"
 Macular Retina	Rare	1	NA
 Meconium	Rare	1	NA
 Medium	Rare	0	NA
@@ -47,10 +52,12 @@ Ostomy fluid	Uncommon	1	NA
 Pancreatic fluid	Rare	1	NA
 PCR water	Uncommon	0	NA
 Peripheral retina	Rare	1	NA
-Placenta	Rare	1	NA
+Placenta
+Plaque	Rare	1	NA
 Plasma	Uncommon	1	NA
 Rectal biopsy	Common	1	NA
-Rectal swab	Common	1	We have observed that results are sensitive to exact collection method employed, please include notes in publication.
+Rectal swab
+Rumen fluid	Common	1	We have observed that results are sensitive to exact collection method employed, please include notes in publication.
 Saline	Uncommon	0	NA
 Saliva	Uncommon	1	NA
 Sediment	Uncommon	0	NA
@@ -63,11 +70,11 @@ Surface swab	Common	0	NA
 Tongue swab	Common	1	NA
 Tonsil	Rare	1	NA
 Tracheal aspirate	Common	1	NA
-Tracheal control	Uncommon	1	NA
+Tracheal control
+Tracheal lavage	Uncommon	1	NA
 Urethral swab	Rare	1	NA
-Urine	Uncommon	1	NA
+Urine
+Vaginal swab	Uncommon	1	NA
 Water	Uncommon	0	NA
 Weighing paper	Common	0	NA
 Whole gut	Uncommon	1	From dissection.
-Large intestine mucosa	Common	1	"NA"
-Large intestine lumen	Common	1	"NA"
