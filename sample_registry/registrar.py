@@ -3,18 +3,12 @@ from sqlalchemy import and_, create_engine, delete, insert, select, update
 from sqlalchemy.orm import Session, sessionmaker
 from sample_registry.db import STANDARD_TAGS
 from sample_registry.mapping import SampleTable
-from sample_registry.models import (
-    Annotation,
-    Sample,
-    StandardSampleType,
-    StandardHostSpecies,
-    Run,
-)
-from seqBackupLib.illumina import MACHINE_TYPES
+from sample_registry.models import Annotation, Sample, Run
+from sample_registry.standards import MACHINE_TYPE_MAPPINGS
 
 
 class SampleRegistry:
-    machines = MACHINE_TYPES.values()
+    machines = MACHINE_TYPE_MAPPINGS.values()
     kits = ["Nextera XT"]
 
     def __init__(self, session: Optional[Session] = None, uri: Optional[str] = None):
@@ -296,39 +290,3 @@ class SampleRegistry:
             .values({"val": val})
         )
 
-    def remove_standard_sample_types(self):
-        self.session.execute(delete(StandardSampleType))
-
-    def register_standard_sample_types(
-        self, sample_types: list[tuple[str, str, bool, str]]
-    ):
-        self.session.execute(
-            insert(StandardSampleType).values(
-                [
-                    {
-                        "sample_type": sample_type,
-                        "rarity": rarity,
-                        "host_associated": bool(host_associated),
-                        "comment": comment,
-                    }
-                    for sample_type, rarity, host_associated, comment in sample_types
-                ]
-            )
-        )
-
-    def remove_standard_host_species(self):
-        self.session.execute(delete(StandardHostSpecies))
-
-    def register_standard_host_species(self, host_species):
-        self.session.execute(
-            insert(StandardHostSpecies).values(
-                [
-                    {
-                        "host_species": host_species,
-                        "scientific_name": scientific_name,
-                        "ncbi_taxon_id": int(ncbi_taxon_id),
-                    }
-                    for host_species, scientific_name, ncbi_taxon_id in host_species
-                ]
-            )
-        )

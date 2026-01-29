@@ -13,16 +13,12 @@ from sample_registry.models import (
     Base,
     Run,
     Sample,
-    StandardHostSpecies,
-    StandardSampleType,
 )
 from sample_registry.register import (
     register_run,
     register_sample_annotations,
     unregister_samples,
     register_illumina_file,
-    register_sample_types,
-    register_host_species,
 )
 
 samples = [
@@ -236,78 +232,3 @@ def test_unregister_samples(db, temp_sample_file):
     assert not db.scalar(select(Annotation).where(Annotation.sample_accession == 6))
     assert not db.scalar(select(Annotation).where(Annotation.sample_accession == 7))
 
-
-def test_register_sample_types(db):
-    f = tempfile.NamedTemporaryFile("wt")
-    f.write(SAMPLE_TYPES_TSV)
-    f.seek(0)
-
-    register_sample_types([f.name], db)
-    assert db.scalars(select(StandardSampleType.sample_type)).all() == [
-        "Colonic biopsy",
-        "Feces",
-        "Oral wash",
-        "Ostomy fluid",
-        "Rectal swab",
-    ]
-
-    # Add a new sample type and re-register
-    new_line = "Extra type\tCommon\t1\tJust to test"
-    f2 = tempfile.NamedTemporaryFile("wt")
-    f2.write(SAMPLE_TYPES_TSV + new_line)
-    f2.seek(0)
-
-    register_sample_types([f2.name], db)
-    assert db.scalars(select(StandardSampleType.sample_type)).all() == [
-        "Colonic biopsy",
-        "Extra type",
-        "Feces",
-        "Oral wash",
-        "Ostomy fluid",
-        "Rectal swab",
-    ]
-
-
-def test_register_host_species(db):
-    f = tempfile.NamedTemporaryFile("wt")
-    f.write(HOST_SPECIES_TSV)
-    f.seek(0)
-
-    register_host_species([f.name], db)
-    assert db.scalars(select(StandardHostSpecies.host_species)).all() == [
-        "Human",
-        "Mouse",
-    ]
-
-    # Add a new host species and re-register
-    new_line = "Dog\tCanis lupus\t9615"
-    f2 = tempfile.NamedTemporaryFile("wt")
-    f2.write(HOST_SPECIES_TSV + new_line)
-    f2.seek(0)
-
-    register_host_species([f2.name], db)
-    assert db.scalars(select(StandardHostSpecies.host_species)).all() == [
-        "Dog",
-        "Human",
-        "Mouse",
-    ]
-
-
-SAMPLE_TYPES_TSV = """\
-sample_type\trarity\thost_associated\tdescription
-
-# Gut
-Feces\tCommon\t1\tHuman and animal fecal material.\tNA
-Rectal swab\tCommon\t1\tResults are sensitive to collection method.\tNA
-Ostomy fluid\tCommon\t1\tNA
-Colonic biopsy\tCommon\t1\tNA
-
-# Oral
-Oral wash\tCommon\t1\tNA
-"""
-
-HOST_SPECIES_TSV = """\
-host_species\tscientific_name\tncbi_taxid
-Human\tHomo sapiens\t9606
-Mouse\tMus musculus\t10090
-"""
