@@ -47,5 +47,3 @@ class Annotation(Base):
 
     def __repr__(self):
         return f"Annotation(sample_accession={self.sample_accession}, key={self.key}, val={self.val})"
-
-

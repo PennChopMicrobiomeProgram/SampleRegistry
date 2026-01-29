@@ -181,5 +181,3 @@ def test_modify_annotation(db):
         ).val
         == "new val"
     )
-
-

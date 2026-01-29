@@ -219,7 +219,9 @@ def show_stats():
         .order_by(db.func.count(Sample.sample_accession).desc(), Sample.sample_type)
         .all()
         if standard_sampletypes
-        else db.session.query(Sample.sample_type, db.func.count(Sample.sample_accession))
+        else db.session.query(
+            Sample.sample_type, db.func.count(Sample.sample_accession)
+        )
         .filter(Sample.sample_type.isnot(None))
         .group_by(Sample.sample_type)
         .order_by(db.func.count(Sample.sample_accession).desc(), Sample.sample_type)
@@ -266,7 +268,9 @@ def show_stats():
         .order_by(db.func.count(Sample.sample_accession).desc(), Sample.host_species)
         .all()
         if standard_hostspecies
-        else db.session.query(Sample.host_species, db.func.count(Sample.sample_accession))
+        else db.session.query(
+            Sample.host_species, db.func.count(Sample.sample_accession)
+        )
         .filter(Sample.host_species.isnot(None))
         .group_by(Sample.host_species)
         .order_by(db.func.count(Sample.sample_accession).desc(), Sample.host_species)

@@ -231,4 +231,3 @@ def test_unregister_samples(db, temp_sample_file):
     assert not db.scalar(select(Sample).where(Sample.run_accession == 4))
     assert not db.scalar(select(Annotation).where(Annotation.sample_accession == 6))
     assert not db.scalar(select(Annotation).where(Annotation.sample_accession == 7))
-
