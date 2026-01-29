@@ -1,8 +1,8 @@
 import csv
-import pickle
+import gzip
 import os
-from collections import defaultdict
-from datetime import datetime
+import pickle
+from contextlib import contextmanager
 from flask import (
     Flask,
     make_response,
@@ -17,10 +17,13 @@ from flask import (
 from flask_sqlalchemy import SQLAlchemy
 from io import StringIO
 from pathlib import Path
-from sample_registry import ARCHIVE_ROOT, SQLALCHEMY_DATABASE_URI
-from sample_registry.models import Base, Annotation, Run, Sample
+from sample_registry import SQLALCHEMY_DATABASE_URI, Session as RegistrySession
 from sample_registry.db import run_to_dataframe, query_tag_stats, STANDARD_TAGS
+from sample_registry.mapping import SampleTable
+from sample_registry.models import Base, Annotation, Run, Sample
+from sample_registry.registrar import SampleRegistry
 from sample_registry.standards import STANDARD_HOST_SPECIES, STANDARD_SAMPLE_TYPES
+from seqBackupLib.illumina import IlluminaFastq
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
@@ -31,13 +34,65 @@ app.secret_key = os.urandom(12)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 # Sanitize and RO db connection
-SQLALCHEMY_DATABASE_URI = f"{SQLALCHEMY_DATABASE_URI.split('?')[0]}?mode=ro"
-app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
-print(SQLALCHEMY_DATABASE_URI)
+BASE_DATABASE_URI = SQLALCHEMY_DATABASE_URI
+READONLY_DATABASE_URI = f"{BASE_DATABASE_URI.split('?')[0]}?mode=ro"
+app.config["SQLALCHEMY_DATABASE_URI"] = READONLY_DATABASE_URI
+print(READONLY_DATABASE_URI)
 # Ensure SQLite explicitly opens in read-only mode
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"connect_args": {"uri": True}}
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
+
+
+@contextmanager
+def _registry_session():
+    session = RegistrySession()
+    try:
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+
+def _request_data():
+    data = request.get_json(silent=True)
+    if data is None:
+        data = request.form.to_dict()
+    return data or {}
+
+
+def _require_fields(data, fields):
+    missing = [field for field in fields if data.get(field) in (None, "")]
+    if missing:
+        raise ValueError(f"Missing required field(s): {', '.join(missing)}")
+
+
+def _parse_int(value, field_name):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        raise ValueError(f"Invalid {field_name} '{value}' (expected integer)")
+
+
+def _api_error(message, status=400):
+    return jsonify({"status": "error", "message": message}), status
+
+
+def _load_sample_table(data):
+    if data.get("sample_table") is not None:
+        sample_table_contents = data["sample_table"]
+    elif "sample_table" in request.files:
+        sample_table_contents = request.files["sample_table"].read().decode("utf-8")
+    else:
+        raise ValueError("Missing required field: sample_table")
+
+    sample_table = SampleTable.load(StringIO(sample_table_contents))
+    sample_table.look_up_nextera_barcodes()
+    sample_table.validate()
+    return sample_table
 
 
 @app.route("/favicon.ico")
@@ -301,74 +356,203 @@ def show_stats():
     )
 
 
-def _parsed_month(date_str: str):
-    for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%m/%d/%y", "%m/%d/%Y"):
-        try:
-            return datetime.strptime(date_str, fmt).strftime("%Y-%m")
-        except ValueError:
-            continue
-    return None
+@app.route("/api/register_run", methods=["POST"])
+def api_register_run():
+    data = _request_data()
+    try:
+        _require_fields(data, ["file", "date", "comment"])
+        lane = _parse_int(data.get("lane", 1), "lane")
+        machine_type = data.get("type", "Illumina-MiSeq")
+        with _registry_session() as session:
+            registry = SampleRegistry(session)
+            acc = registry.register_run(
+                data["date"],
+                machine_type,
+                "Nextera XT",
+                lane,
+                data["file"],
+                data["comment"],
+            )
+        return jsonify({"status": "ok", "run_accession": acc})
+    except (ValueError, IOError, OSError) as exc:
+        return _api_error(str(exc), 400)
+    except Exception:
+        return _api_error("Internal server error", 500)
 
 
-def _archive_size_for_run(run, warnings):
-    archive_path = (ARCHIVE_ROOT / run.data_uri).parent
-    run_label = f"CMR{run.run_accession:06d}"
-
-    if not archive_path.exists():
-        warnings.append(f"{run_label}: Archive path {archive_path} does not exist")
-        return 0
-
-    if not archive_path.is_dir():
-        warnings.append(f"{run_label}: Archive path {archive_path} is not a directory")
-        return 0
-
-    total_size = 0
-    for entry in archive_path.rglob("*"):
-        try:
-            if entry.is_file():
-                total_size += entry.stat().st_size
-        except OSError as exc:
-            warnings.append(f"{run_label}: Error accessing {entry}: {exc}")
-
-    if total_size == 0:
-        warnings.append(f"{run_label}: Archive at {archive_path} has size 0 bytes")
-
-    return total_size
+@app.route("/api/register_run_file", methods=["POST"])
+def api_register_run_file():
+    data = _request_data()
+    try:
+        _require_fields(data, ["file", "comment"])
+        with _registry_session() as session:
+            registry = SampleRegistry(session)
+            illumina_fastq = IlluminaFastq(gzip.open(data["file"], "rt"))
+            acc = registry.register_run(
+                illumina_fastq.folder_info["date"],
+                illumina_fastq.machine_type,
+                "Nextera XT",
+                illumina_fastq.lane,
+                str(illumina_fastq.filepath),
+                data["comment"],
+            )
+        return jsonify({"status": "ok", "run_accession": acc})
+    except (ValueError, IOError, OSError) as exc:
+        return _api_error(str(exc), 400)
+    except Exception:
+        return _api_error("Internal server error", 500)
 
 
-@app.route("/api/archive_sizes")
-def archive_sizes():
-    runs = db.session.query(Run).all()
-    warnings = []
-    max_warnings = 50
-    totals_by_month = defaultdict(int)
-
-    for run in runs:
-        month_label = _parsed_month(run.run_date)
-        if not month_label:
-            if len(warnings) < max_warnings:
-                warnings.append(
-                    f"CMR{run.run_accession:06d}: Unable to parse run_date '{run.run_date}'"
-                )
-            continue
-
-        archive_size = _archive_size_for_run(run, warnings)
-        totals_by_month[month_label] += archive_size
-
-    if len(warnings) >= max_warnings:
-        warnings.append("... Additional warnings truncated ...")
-
-    by_month = [
-        {"month": month, "size_bytes": totals_by_month[month]}
-        for month in sorted(totals_by_month.keys())
-    ]
-
-    return jsonify({"by_month": by_month, "warnings": warnings})
+@app.route("/api/unregister_samples", methods=["POST"])
+def api_unregister_samples():
+    data = _request_data()
+    try:
+        _require_fields(data, ["run_accession"])
+        run_accession = _parse_int(data["run_accession"], "run_accession")
+        with _registry_session() as session:
+            registry = SampleRegistry(session)
+            registry.check_run_accession(run_accession)
+            samples_removed = registry.remove_samples(run_accession)
+        return jsonify(
+            {
+                "status": "ok",
+                "run_accession": run_accession,
+                "samples_removed": samples_removed,
+                "samples_removed_count": len(samples_removed),
+            }
+        )
+    except (ValueError, IOError, OSError) as exc:
+        return _api_error(str(exc), 400)
+    except Exception:
+        return _api_error("Internal server error", 500)
 
 
-@app.route("/archive")
-def archive():
-    return render_template("archive.html")
+@app.route("/api/register_samples", methods=["POST"])
+def api_register_samples():
+    data = _request_data()
+    try:
+        _require_fields(data, ["run_accession"])
+        run_accession = _parse_int(data["run_accession"], "run_accession")
+        sample_table = _load_sample_table(data)
+        with _registry_session() as session:
+            registry = SampleRegistry(session)
+            registry.check_samples(run_accession, exists=False)
+            registry.check_run_accession(run_accession)
+            sample_accessions = list(
+                registry.register_samples(run_accession, sample_table)
+            )
+            annotation_keys = registry.register_annotations(run_accession, sample_table)
+        return jsonify(
+            {
+                "status": "ok",
+                "run_accession": run_accession,
+                "sample_accessions": sample_accessions,
+                "annotation_count": len(annotation_keys),
+            }
+        )
+    except (ValueError, IOError, OSError) as exc:
+        return _api_error(str(exc), 400)
+    except Exception:
+        return _api_error("Internal server error", 500)
+
+
+@app.route("/api/register_annotations", methods=["POST"])
+def api_register_annotations():
+    data = _request_data()
+    try:
+        _require_fields(data, ["run_accession"])
+        run_accession = _parse_int(data["run_accession"], "run_accession")
+        sample_table = _load_sample_table(data)
+        with _registry_session() as session:
+            registry = SampleRegistry(session)
+            registry.check_run_accession(run_accession)
+            annotation_keys = registry.register_annotations(run_accession, sample_table)
+        return jsonify(
+            {
+                "status": "ok",
+                "run_accession": run_accession,
+                "annotation_count": len(annotation_keys),
+            }
+        )
+    except (ValueError, IOError, OSError) as exc:
+        return _api_error(str(exc), 400)
+    except Exception:
+        return _api_error("Internal server error", 500)
+
+
+@app.route("/api/modify_run", methods=["POST"])
+def api_modify_run():
+    data = _request_data()
+    try:
+        _require_fields(data, ["run_accession"])
+        run_accession = _parse_int(data["run_accession"], "run_accession")
+        lane = data.get("lane")
+        if lane is not None:
+            lane = _parse_int(lane, "lane")
+        with _registry_session() as session:
+            registry = SampleRegistry(session)
+            registry.check_run_accession(run_accession)
+            registry.modify_run(
+                run_accession=run_accession,
+                run_date=data.get("date"),
+                machine_type=data.get("type"),
+                machine_kit=data.get("kit"),
+                lane=lane,
+                data_uri=data.get("data_uri"),
+                comment=data.get("comment"),
+                admin_comment=data.get("admin_comment"),
+            )
+        return jsonify({"status": "ok", "run_accession": run_accession})
+    except (ValueError, IOError, OSError) as exc:
+        return _api_error(str(exc), 400)
+    except Exception:
+        return _api_error("Internal server error", 500)
+
+
+@app.route("/api/modify_sample", methods=["POST"])
+def api_modify_sample():
+    data = _request_data()
+    try:
+        _require_fields(data, ["sample_accession"])
+        sample_accession = _parse_int(data["sample_accession"], "sample_accession")
+        with _registry_session() as session:
+            registry = SampleRegistry(session)
+            registry.check_sample_accession(sample_accession)
+            registry.modify_sample(
+                sample_accession=sample_accession,
+                sample_name=data.get("sample_name"),
+                sample_type=data.get("sample_type"),
+                subject_id=data.get("subject_id"),
+                host_species=data.get("host_species"),
+                barcode_sequence=data.get("barcode_sequence"),
+                primer_sequence=data.get("primer_sequence"),
+            )
+        return jsonify({"status": "ok", "sample_accession": sample_accession})
+    except (ValueError, IOError, OSError) as exc:
+        return _api_error(str(exc), 400)
+    except Exception:
+        return _api_error("Internal server error", 500)
+
+
+@app.route("/api/modify_annotation", methods=["POST"])
+def api_modify_annotation():
+    data = _request_data()
+    try:
+        _require_fields(data, ["sample_accession", "key", "val"])
+        sample_accession = _parse_int(data["sample_accession"], "sample_accession")
+        with _registry_session() as session:
+            registry = SampleRegistry(session)
+            registry.check_sample_accession(sample_accession)
+            registry.modify_annotation(
+                sample_accession=sample_accession,
+                key=data["key"],
+                val=data["val"],
+            )
+        return jsonify({"status": "ok", "sample_accession": sample_accession})
+    except (ValueError, IOError, OSError) as exc:
+        return _api_error(str(exc), 400)
+    except Exception:
+        return _api_error("Internal server error", 500)
 
 
 @app.route("/download/<run_acc>", methods=["GET", "POST"])
