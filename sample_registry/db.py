@@ -10,7 +10,7 @@ from sample_registry.models import (
     Annotation,
 )
 
-STANDARD_TAGS = {
+STANDARD_TAGS: dict[str, str] = {
     "SampleType": "sample_type",
     "SubjectID": "subject_id",
     "HostSpecies": "host_species",
