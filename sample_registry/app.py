@@ -21,6 +21,7 @@ from sample_registry import ARCHIVE_ROOT, SQLALCHEMY_DATABASE_URI
 from sample_registry.models import Base, Annotation, Run, Sample
 from sample_registry.db import run_to_dataframe, query_tag_stats, STANDARD_TAGS
 from sample_registry.standards import STANDARD_HOST_SPECIES, STANDARD_SAMPLE_TYPES
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
@@ -38,6 +39,21 @@ print(SQLALCHEMY_DATABASE_URI)
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"connect_args": {"uri": True}}
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
+
+def _normalize_url_prefix(raw_prefix: str) -> str:
+    prefix = (raw_prefix or "").strip()
+    if not prefix or prefix == "/":
+        return ""
+    if not prefix.startswith("/"):
+        prefix = f"/{prefix}"
+    return prefix.rstrip("/")
+
+
+URL_PREFIX = _normalize_url_prefix(os.getenv("SAMPLE_REGISTRY_URL_PREFIX"))
+if URL_PREFIX:
+    application = DispatcherMiddleware(Flask("dummy_root"), {URL_PREFIX: app})
+else:
+    application = app
 
 
 @app.route("/favicon.ico")

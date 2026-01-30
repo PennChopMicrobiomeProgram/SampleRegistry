@@ -28,6 +28,8 @@ How you want to deploy this will depend on your needs, facilities, and ability. 
 
 When running, it will default to using a SQLite3 database located in the root of this repository (automatically created if it doesn't already exist). You can change to use a different backend by setting the `SAMPLE_REGISTRY_DB_URI` environment variable before running the app. For example, another sqlite database could be specified with a URI like this: `export SAMPLE_REGISTRY_DB_URI=sqlite:////path/to/db.sqlite`.
 
+If you're deploying behind a reverse proxy at a URL prefix, set `SAMPLE_REGISTRY_URL_PREFIX` (for example, `/sample_registry`). The WSGI entrypoint `sample_registry.app:application` will mount the Flask app at that prefix while leaving local development (`python sample_registry/app.py`) available at `/`.
+
 ## Using the library
 
 The `sample_registry` library can be installed and run anywhere by following the instructions in Development (you don't need to do the `create_test_db` and running the site (bottom two commands)). To connect to a non-dev backend, see the above on SQLAlchemy URIs.
