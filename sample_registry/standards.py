@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 from dataclasses import dataclass
 from importlib import resources
-from typing import Iterable
+from typing import Iterable, Optional
 
 DATA_PACKAGE = "sample_registry.data"
 
@@ -11,9 +11,9 @@ DATA_PACKAGE = "sample_registry.data"
 @dataclass(frozen=True)
 class StandardSampleType:
     sample_type: str
-    rarity: str
-    host_associated: bool
-    description: str
+    rarity: Optional[str]
+    host_associated: Optional[bool]
+    description: Optional[str]
 
 
 @dataclass(frozen=True)
@@ -46,10 +46,6 @@ def _read_tsv_rows(filename: str, min_columns: int) -> list[list[str]]:
                     continue
                 if row[0].startswith("#"):
                     continue
-                if len(row) < min_columns:
-                    raise ValueError(
-                        f"Expected at least {min_columns} columns in {filename}, got {len(row)}"
-                    )
                 rows.append(row)
     return rows
 
@@ -63,11 +59,20 @@ class StandardSampleTypes:
     def load(cls) -> "StandardSampleTypes":
         rows = _read_tsv_rows("standard_sample_types.tsv", 4)
         entries = [
-            StandardSampleType(
-                sample_type=row[0],
-                rarity=row[1],
-                host_associated=_parse_bool(row[2]),
-                description=row[3],
+            (
+                StandardSampleType(
+                    sample_type=row[0],
+                    rarity=row[1],
+                    host_associated=_parse_bool(row[2]),
+                    description=row[3],
+                )
+                if len(row) >= 4
+                else StandardSampleType(
+                    sample_type=row[0],
+                    rarity=None,
+                    host_associated=None,
+                    description=None,
+                )
             )
             for row in rows
         ]
