@@ -31,6 +31,14 @@ class SampleRegistry:
             raise ValueError("Run does not exist %s" % acc)
         return run
 
+    def check_sample_accession(self, acc: int) -> Sample:
+        sample = self.session.scalar(
+            select(Sample).where(Sample.sample_accession == acc)
+        )
+        if not sample:
+            raise ValueError("Sample does not exist %s" % acc)
+        return sample
+
     def get_run(self, run_accession: int) -> Run | None:
         """Return the ``Run`` record for ``run_accession``.
 
