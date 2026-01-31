@@ -5,10 +5,8 @@ import pytest
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 
-from sample_registry.db import create_test_db
 from sample_registry.mapping import SampleTable
 from sample_registry.models import Annotation, Base, Run, Sample
-
 
 SAMPLES = [
     {
@@ -47,16 +45,17 @@ def _sample_table_payload(records):
 def api_client(tmp_path, monkeypatch):
     db_path = tmp_path / "registry.sqlite"
     uri = f"sqlite:///{db_path}"
+    monkeypatch.setenv("SAMPLE_REGISTRY_DB_URI", uri)
+    monkeypatch.delenv("PYTEST_VERSION", raising=False)
     engine = create_engine(uri, echo=False)
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
     session = Session()
+    create_test_db = importlib.import_module("sample_registry.db").create_test_db
     create_test_db(session)
     session.close()
 
-    monkeypatch.setenv("SAMPLE_REGISTRY_DB_URI", uri)
-    import sample_registry
-
+    sample_registry = importlib.import_module("sample_registry")
     importlib.reload(sample_registry)
     import sample_registry.app as app_module
 
@@ -119,7 +118,9 @@ def test_api_register_samples(api_client):
     session = Session()
     try:
         samples = session.scalars(
-            select(Sample).where(Sample.run_accession == 4).order_by(Sample.sample_accession)
+            select(Sample)
+            .where(Sample.run_accession == 4)
+            .order_by(Sample.sample_accession)
         ).all()
         assert [s.sample_accession for s in samples] == [6, 7]
         assert samples[0].sample_type == "Oral swab"
