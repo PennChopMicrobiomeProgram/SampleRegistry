@@ -1,5 +1,4 @@
 import csv
-import gzip
 import pickle
 import os
 from collections import defaultdict
@@ -25,9 +24,10 @@ from sample_registry.models import Base, Annotation, Run, Sample
 from sample_registry.db import run_to_dataframe, query_tag_stats, STANDARD_TAGS
 from sample_registry.registrar import SampleRegistry
 from sample_registry.standards import STANDARD_HOST_SPECIES, STANDARD_SAMPLE_TYPES
-from seqBackupLib.illumina import IlluminaFastq
 from typing import Optional
 from werkzeug.middleware.proxy_fix import ProxyFix
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 app = Flask(__name__)
 app.secret_key = os.urandom(12)
@@ -45,14 +45,18 @@ print(SQLALCHEMY_DATABASE_URI)
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"connect_args": {"uri": True}}
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
+write_engine = create_engine(SQLALCHEMY_WRITE_URI, echo=False)
+WriteSession = sessionmaker(bind=write_engine)
 
 
 @contextmanager
 def api_registry():
-    registry = SampleRegistry(uri=SQLALCHEMY_WRITE_URI)
+    session = WriteSession()
+    registry = SampleRegistry(session=session)
     try:
         yield registry
     finally:
+        session.close()
         registry.session.close()
 
 
@@ -410,32 +414,9 @@ def api_register_run():
                 data["comment"],
             )
             registry.session.commit()
-        except Exception as exc:
+        except Exception:
             registry.session.rollback()
-            return api_error(str(exc))
-    return jsonify({"status": "ok", "run_accession": run_accession})
-
-
-@app.post("/api/register_illumina_file")
-def api_register_illumina_file():
-    data = api_request_data()
-    missing = [k for k in ("file", "comment") if not data.get(k)]
-    if missing:
-        return api_error(f"Missing required fields: {', '.join(missing)}")
-    try:
-        f = IlluminaFastq(gzip.open(data["file"], "rt"))
-        with api_registry() as registry:
-            run_accession = registry.register_run(
-                f.folder_info["date"],
-                f.machine_type,
-                "Nextera XT",
-                f.lane,
-                str(f.filepath),
-                data["comment"],
-            )
-            registry.session.commit()
-    except Exception as exc:
-        return api_error(str(exc))
+            raise
     return jsonify({"status": "ok", "run_accession": run_accession})
 
 
@@ -460,9 +441,9 @@ def api_register_sample_annotations(register_samples: bool):
                 registry.register_samples(run_accession, sample_table)
             registry.register_annotations(run_accession, sample_table)
             registry.session.commit()
-        except Exception as exc:
+        except Exception:
             registry.session.rollback()
-            return api_error(str(exc))
+            raise
     return jsonify(
         {
             "status": "ok",
@@ -496,9 +477,9 @@ def api_unregister_samples():
             registry.check_run_accession(run_accession)
             samples_removed = registry.remove_samples(run_accession)
             registry.session.commit()
-        except Exception as exc:
+        except Exception:
             registry.session.rollback()
-            return api_error(str(exc))
+            raise
     return jsonify(
         {
             "status": "ok",
@@ -537,9 +518,9 @@ def api_modify_run():
                 admin_comment=data.get("admin_comment"),
             )
             registry.session.commit()
-        except Exception as exc:
+        except Exception:
             registry.session.rollback()
-            return api_error(str(exc))
+            raise
     return jsonify({"status": "ok", "run_accession": run_accession})
 
 
@@ -565,9 +546,9 @@ def api_modify_sample():
                 primer_sequence=data.get("primer_sequence"),
             )
             registry.session.commit()
-        except Exception as exc:
+        except Exception:
             registry.session.rollback()
-            return api_error(str(exc))
+            raise
     return jsonify({"status": "ok", "sample_accession": sample_accession})
 
 
@@ -590,9 +571,9 @@ def api_modify_annotation():
                 val=data["val"],
             )
             registry.session.commit()
-        except Exception as exc:
+        except Exception:
             registry.session.rollback()
-            return api_error(str(exc))
+            raise
     return jsonify({"status": "ok", "sample_accession": sample_accession})
 
 
