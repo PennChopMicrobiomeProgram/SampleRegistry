@@ -245,8 +245,6 @@ def test_api_modify_sample(api_client):
         session.close()
 
 
-
-
 def test_api_get_run(api_client):
     client, _ = api_client
     response = client.get("/api/get_run", query_string={"run_accession": 1})
@@ -279,9 +277,7 @@ def test_api_get_samples(api_client):
 
 def test_api_get_annotations(api_client):
     client, _ = api_client
-    response = client.get(
-        "/api/get_annotations", query_string={"sample_accession": 1}
-    )
+    response = client.get("/api/get_annotations", query_string={"sample_accession": 1})
     assert response.status_code == 200
     payload = response.get_json()
     assert payload["status"] == "ok"
