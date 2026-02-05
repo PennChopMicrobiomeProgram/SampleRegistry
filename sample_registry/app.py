@@ -71,6 +71,13 @@ def api_error(message: str, status: int = 400):
     return jsonify({"status": "error", "error": message}), status
 
 
+def api_model_to_dict(model):
+    return {
+        column.name: getattr(model, column.name)
+        for column in model.__table__.columns
+    }
+
+
 def api_sample_table_from_request():
     if "sample_table" in request.files:
         content = request.files["sample_table"].stream.read().decode("utf-8")
@@ -575,6 +582,83 @@ def api_modify_annotation():
             registry.session.rollback()
             raise
     return jsonify({"status": "ok", "sample_accession": sample_accession})
+
+
+@app.get("/api/get_run")
+def api_get_run():
+    run_accession = request.args.get("run_accession")
+    if not run_accession:
+        return api_error("Missing required query parameter: run_accession")
+    try:
+        run_accession = int(run_accession)
+    except ValueError as exc:
+        return api_error(f"Invalid run_accession value: {exc}")
+
+    with api_registry() as registry:
+        run = registry.get_run(run_accession)
+
+    return jsonify(
+        {
+            "status": "ok",
+            "run": api_model_to_dict(run) if run else None,
+        }
+    )
+
+
+@app.get("/api/get_runs_by_data_uri")
+def api_get_runs_by_data_uri():
+    substring = request.args.get("substring")
+    if not substring:
+        return api_error("Missing required query parameter: substring")
+
+    with api_registry() as registry:
+        run_accessions = registry.get_runs_by_data_uri(substring)
+
+    return jsonify({"status": "ok", "run_accessions": run_accessions})
+
+
+@app.get("/api/get_samples")
+def api_get_samples():
+    run_accession = request.args.get("run_accession")
+    if not run_accession:
+        return api_error("Missing required query parameter: run_accession")
+    try:
+        run_accession = int(run_accession)
+    except ValueError as exc:
+        return api_error(f"Invalid run_accession value: {exc}")
+
+    with api_registry() as registry:
+        samples = registry.get_samples(run_accession)
+
+    return jsonify(
+        {
+            "status": "ok",
+            "samples": [api_model_to_dict(sample) for sample in samples],
+        }
+    )
+
+
+@app.get("/api/get_annotations")
+def api_get_annotations():
+    sample_accession = request.args.get("sample_accession")
+    if not sample_accession:
+        return api_error("Missing required query parameter: sample_accession")
+    try:
+        sample_accession = int(sample_accession)
+    except ValueError as exc:
+        return api_error(f"Invalid sample_accession value: {exc}")
+
+    with api_registry() as registry:
+        annotations = registry.get_annotations(sample_accession)
+
+    return jsonify(
+        {
+            "status": "ok",
+            "annotations": [
+                api_model_to_dict(annotation) for annotation in annotations
+            ],
+        }
+    )
 
 
 @app.route("/description")
