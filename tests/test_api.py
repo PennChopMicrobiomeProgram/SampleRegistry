@@ -245,6 +245,53 @@ def test_api_modify_sample(api_client):
         session.close()
 
 
+
+
+def test_api_get_run(api_client):
+    client, _ = api_client
+    response = client.get("/api/get_run", query_string={"run_accession": 1})
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["status"] == "ok"
+    assert payload["run"]["run_accession"] == 1
+    assert payload["run"]["comment"] == "Test run 1"
+
+
+def test_api_get_runs_by_data_uri(api_client):
+    client, _ = api_client
+    response = client.get(
+        "/api/get_runs_by_data_uri", query_string={"substring": "run2"}
+    )
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["status"] == "ok"
+    assert payload["run_accessions"] == [2]
+
+
+def test_api_get_samples(api_client):
+    client, _ = api_client
+    response = client.get("/api/get_samples", query_string={"run_accession": 1})
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["status"] == "ok"
+    assert [sample["sample_accession"] for sample in payload["samples"]] == [1, 2]
+
+
+def test_api_get_annotations(api_client):
+    client, _ = api_client
+    response = client.get(
+        "/api/get_annotations", query_string={"sample_accession": 1}
+    )
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["status"] == "ok"
+    annotations = sorted(payload["annotations"], key=lambda item: item["key"])
+    assert annotations == [
+        {"sample_accession": 1, "key": "key0", "val": "val0"},
+        {"sample_accession": 1, "key": "key4", "val": "val0"},
+    ]
+
+
 def test_api_modify_annotation(api_client):
     client, Session = api_client
     response = client.post(

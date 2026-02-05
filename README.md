@@ -104,7 +104,7 @@ modify_sample <sample_accession> --sample_name "New sample name"
 
 ## API usage
 
-The Flask app exposes JSON API endpoints under `/api/*`. Every endpoint accepts a `POST` request with `Content-Type: application/json` and returns JSON.
+The Flask app exposes JSON API endpoints under `/api/*`. Write endpoints accept `POST` requests with `Content-Type: application/json`, and read endpoints accept `GET` requests with query parameters. All endpoints return JSON.
 
 Available endpoints:
 
@@ -115,6 +115,10 @@ Available endpoints:
 - `POST /api/modify_run`
 - `POST /api/modify_sample`
 - `POST /api/modify_annotation`
+- `GET /api/get_run`
+- `GET /api/get_runs_by_data_uri`
+- `GET /api/get_samples`
+- `GET /api/get_annotations`
 
 Example API calls:
 
@@ -139,6 +143,15 @@ curl -X POST "https://mbiome.research.chop.edu/sample_registry/api/modify_run" \
 curl -X POST "https://mbiome.research.chop.edu/sample_registry/api/modify_sample" \
   -H "Content-Type: application/json" \
   -d '{"sample_accession": 1042, "sample_name": "SampleABC"}'
+
+
+# Get a run
+curl -G "https://mbiome.research.chop.edu/sample_registry/api/get_run" \
+  --data-urlencode "run_accession=1638"
+
+# Get all samples for a run
+curl -G "https://mbiome.research.chop.edu/sample_registry/api/get_samples" \
+  --data-urlencode "run_accession=1638"
 ```
 
 For metadata-table endpoints (`register_samples` and `register_annotations`), provide either:
