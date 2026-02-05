@@ -29,7 +29,7 @@ When running, it will default to using a SQLite3 database located in the root of
 
 ## Using the library
 
-There are three ways of using the libraries utilities (register_run, register_samples, modify_run, etc):
+There are three ways of using the library utilities (register_run, register_samples, modify_run, etc):
 
 1. Install this repo into your home directory on mbiome and run it directly from there:
 
@@ -60,6 +60,93 @@ sudo podman exec sample-registry modify_run -h
 # From any computer on the CHOP network
 curl -H "Content-Type: application/json" -d '{"run_accession": "1638", "comment": "CHOPMC-580 Ahmed Moustafa rerun 3 (10 pM)"}' https://mbiome.research.chop.edu/sample_registry/api/modify_run
 ```
+
+## CLI usage
+
+The project installs the following CLI commands:
+
+- `register_run`
+- `register_run_file`
+- `register_samples`
+- `register_annotations`
+- `unregister_samples`
+- `modify_run`
+- `modify_sample`
+- `modify_annotation`
+- `export_samples`
+- `create_test_db`
+- `sample_registry_version`
+
+Use `-h` on any command to show its arguments and examples:
+
+```bash
+register_run -h
+modify_run -h
+register_samples -h
+```
+
+Most commands read/write to the database configured by `SAMPLE_REGISTRY_DB_URI`. If this variable is not set, the default is a local SQLite database in the repository root.
+
+Typical workflow:
+
+```bash
+# 1) register a run
+register_run /path/to/run.fastq.gz --date 2024-09-25 --comment "MiSeq run"
+
+# 2) register samples and annotations from a metadata table
+register_samples <run_accession> sample_metadata.tsv
+register_annotations <run_accession> sample_metadata.tsv
+
+# 3) make updates later
+modify_run <run_accession> --comment "Updated comment"
+modify_sample <sample_accession> --sample_name "New sample name"
+```
+
+## API usage
+
+The Flask app exposes JSON API endpoints under `/api/*`. Every endpoint accepts a `POST` request with `Content-Type: application/json` and returns JSON.
+
+Available endpoints:
+
+- `POST /api/register_run`
+- `POST /api/register_samples`
+- `POST /api/register_annotations`
+- `POST /api/unregister_samples`
+- `POST /api/modify_run`
+- `POST /api/modify_sample`
+- `POST /api/modify_annotation`
+
+Example API calls:
+
+```bash
+# Register a run
+curl -X POST "https://mbiome.research.chop.edu/sample_registry/api/register_run" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "file": "/path/to/run.fastq.gz",
+    "date": "2024-09-25",
+    "comment": "MiSeq run",
+    "lane": 1,
+    "type": "Illumina-MiSeq"
+  }'
+
+# Modify a run
+curl -X POST "https://mbiome.research.chop.edu/sample_registry/api/modify_run" \
+  -H "Content-Type: application/json" \
+  -d '{"run_accession": 1638, "comment": "Updated run comment"}'
+
+# Modify a sample
+curl -X POST "https://mbiome.research.chop.edu/sample_registry/api/modify_sample" \
+  -H "Content-Type: application/json" \
+  -d '{"sample_accession": 1042, "sample_name": "CHOPMC-580"}'
+```
+
+For metadata-table endpoints (`register_samples` and `register_annotations`), provide either:
+
+- a JSON payload with a `sample_table` key containing tab-delimited data, or
+- `multipart/form-data` with a file upload.
+
+On success, endpoints return `{"status": "ok", ...}`. Validation errors return `{"status": "error", "error": "..."}` with HTTP 400.
 
 ## Manually build Docker image
 
