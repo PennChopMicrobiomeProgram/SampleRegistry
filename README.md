@@ -138,7 +138,7 @@ curl -X POST "https://mbiome.research.chop.edu/sample_registry/api/modify_run" \
 # Modify a sample
 curl -X POST "https://mbiome.research.chop.edu/sample_registry/api/modify_sample" \
   -H "Content-Type: application/json" \
-  -d '{"sample_accession": 1042, "sample_name": "CHOPMC-580"}'
+  -d '{"sample_accession": 1042, "sample_name": "SampleABC"}'
 ```
 
 For metadata-table endpoints (`register_samples` and `register_annotations`), provide either:
@@ -154,3 +154,4 @@ If you want to iterate over a feature you can only test on the K8s deployment, y
 
 
 N.B. You might want to use a different tag than `latest` (e.g. `ctbushman/sample_registry:dev`) if you're testing something volatile so that if someone else is trying to use the image as you're developing, they won't pull your wonky changes.
+
