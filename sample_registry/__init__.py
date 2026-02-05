@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from typing import Optional
 
-__version__ = "1.4.0"
+__version__ = "1.4.1"
 
 
 # Define archive root path
