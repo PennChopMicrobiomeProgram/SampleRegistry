@@ -18,22 +18,52 @@ python -m venv env/
 source env/bin/activate
 pip install -e .[dev,web]
 
-create_test_db
-python sample_registry/app.py
+flask --app sample_registry/app run --debug
 ```
 
 ## Deployment
 
-How you want to deploy this will depend on your needs, facilities, and ability. We have it deployed by a Kubernetes cluster but you could also 1) just run it in development mode from a lab computer or 2) setup Nginx/Apache on a dedicated server or 3) run it serverlessly in the cloud (e.g. with [Zappa](https://github.com/zappa/Zappa) on AWS) or 4) do something else. There are lots of well documented examples of deploying Flask sites out there, look around and find what works best for you.
+The SampleRegistry lives on `mbiome` running under Podman. The SQLite database is located at `/var/local/sample_registry/sample_registry.sqlite`. Reference github.research.chop.edu/MicrobiomeCenter/deployments for more info.
 
 When running, it will default to using a SQLite3 database located in the root of this repository (automatically created if it doesn't already exist). You can change to use a different backend by setting the `SAMPLE_REGISTRY_DB_URI` environment variable before running the app. For example, another sqlite database could be specified with a URI like this: `export SAMPLE_REGISTRY_DB_URI=sqlite:////path/to/db.sqlite`.
 
 ## Using the library
 
-The `sample_registry` library can be installed and run anywhere by following the instructions in Development (you don't need to do the `create_test_db` and running the site (bottom two commands)). To connect to a non-dev backend, see the above on SQLAlchemy URIs.
+There are three ways of using the libraries utilities (register_run, register_samples, modify_run, etc):
+
+1. Install this repo into your home directory on mbiome and run it directly from there:
+
+```
+ssh mbiome.research.chop.edu
+git clone https://github.com/PennChopMicrobiomeProgram/SampleRegistry.git
+cd SampleRegistry
+python -m venv env
+# For added convenience, I'd recommend adding SAMPLE_REGISTRY_DB_URI to your env permanently
+# Edit the `activate` script and add a line at the bottom like this:
+# export SAMPLE_REGISTRY_DB_URI=sqlite:////var/local/sample_registry/sample_registry.sqlite
+source env/bin/activate
+pip install -e .
+# Test that it works
+modify_run -h
+```
+
+2. Use the CLI of the version running in Podman:
+
+```
+ssh mbiome.research.chop.edu
+sudo podman exec sample-registry modify_run -h
+```
+
+3. Use the API (behind the scenes, this also uses the CLI of the version running in Podman):
+
+```
+# From any computer on the CHOP network
+curl -H "Content-Type: application/json" -d '{"run_accession": "1638", "comment": "CHOPMC-580 Ahmed Moustafa rerun 3 (10 pM)"}' https://mbiome.research.chop.edu/sample_registry/api/modify_run
+```
 
 ## Manually build Docker image
 
-If you want to iterate over a feature you can only test on the K8s deployment, you can manually build the Docker image instead of relying on the release workflow. Use `docker build -t ctbushman/sample_registry:latest -f Dockerfile .` to build the image and then `docker push ctbushman/sample_registry:latest` to push it to DockerHub. You can then trigger the K8s deployment to grab the new image.
+If you want to iterate over a feature you can only test on the K8s deployment, you can manually build the Docker image instead of relying on the release workflow. Use `docker build -t ctbushman/sample_registry:latest -f Dockerfile .` to build the image and then `docker push ctbushman/sample_registry:latest` to push it to DockerHub. You can then trigger the K8s deployment to grab the new image. You can do the same replacing `docker` with `podman` on mbiome.
 
-N.B. You might want to use a different tag than `latest` if you're testing something volatile so that if someone else is trying to use the image as you're developing, they won't pull your wonky changes.
+
+N.B. You might want to use a different tag than `latest` (e.g. `ctbushman/sample_registry:dev`) if you're testing something volatile so that if someone else is trying to use the image as you're developing, they won't pull your wonky changes.
