@@ -5,7 +5,7 @@ Library for adding/modifying/deleting sequencing runs and associated metadata wi
 [![Tests](https://github.com/PennChopMicrobiomeProgram/SampleRegistry/actions/workflows/pr.yml/badge.svg)](https://github.com/PennChopMicrobiomeProgram/SampleRegistry/actions/workflows/pr.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/5086d0c90973460a82b72ac90dfe3199)](https://app.codacy.com/gh/PennChopMicrobiomeProgram/SampleRegistry/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![codecov](https://codecov.io/gh/PennChopMicrobiomeProgram/SampleRegistry/graph/badge.svg?token=ONUY5PYY9W)](https://codecov.io/gh/PennChopMicrobiomeProgram/SampleRegistry)
-[![DockerHub](https://img.shields.io/docker/pulls/ctbushman/sample_registry)](https://hub.docker.com/repository/docker/ctbushman/sample_registry/)
+[![DockerHub](https://img.shields.io/docker/pulls/chopmicrobiome/sample_registry)](https://hub.docker.com/repository/docker/chopmicrobiome/sample_registry/)
 
 ## Development
 
@@ -163,8 +163,8 @@ On success, endpoints return `{"status": "ok", ...}`. Validation errors return `
 
 ## Manually build Docker image
 
-If you want to iterate over a feature you can only test on the K8s deployment, you can manually build the Docker image instead of relying on the release workflow. Use `docker build -t ctbushman/sample_registry:latest -f Dockerfile .` to build the image and then `docker push ctbushman/sample_registry:latest` to push it to DockerHub. You can then trigger the K8s deployment to grab the new image. You can do the same replacing `docker` with `podman` on mbiome.
+If you want to iterate over a feature you can only test on the K8s deployment, you can manually build the Docker image instead of relying on the release workflow. Use `docker build -t chopmicrobiome/sample_registry:latest -f Dockerfile .` to build the image and then `docker push chopmicrobiome/sample_registry:latest` to push it to DockerHub. You can then trigger the K8s deployment to grab the new image. You can do the same replacing `docker` with `podman` on mbiome.
 
 
-N.B. You might want to use a different tag than `latest` (e.g. `ctbushman/sample_registry:dev`) if you're testing something volatile so that if someone else is trying to use the image as you're developing, they won't pull your wonky changes.
+N.B. You might want to use a different tag than `latest` (e.g. `chopmicrobiome/sample_registry:dev`) if you're testing something volatile so that if someone else is trying to use the image as you're developing, they won't pull your wonky changes.
 
