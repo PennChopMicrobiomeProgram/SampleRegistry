@@ -660,6 +660,72 @@ def api_get_annotations():
     )
 
 
+@app.get("/api/get_full_run")
+def api_get_full_run():
+    run_accession = request.args.get("run_accession")
+    if not run_accession:
+        return api_error("Missing required query parameter: run_accession")
+    try:
+        run_accession = int(run_accession)
+    except ValueError as exc:
+        return api_error(f"Invalid run_accession value: {exc}")
+
+    with api_registry() as registry:
+        full_run = registry.get_full_run(run_accession)
+
+    if not full_run:
+        return jsonify({"status": "ok", "run": None, "samples": []})
+
+    annotations = full_run["annotations_by_sample_accession"]
+    return jsonify(
+        {
+            "status": "ok",
+            "run": api_model_to_dict(full_run["run"]),
+            "samples": [
+                {
+                    "sample": api_model_to_dict(sample),
+                    "annotations": [
+                        api_model_to_dict(annotation)
+                        for annotation in annotations[sample.sample_accession]
+                    ],
+                }
+                for sample in full_run["samples"]
+            ],
+        }
+    )
+
+
+@app.get("/api/get_full_sample")
+def api_get_full_sample():
+    sample_accession = request.args.get("sample_accession")
+    if not sample_accession:
+        return api_error("Missing required query parameter: sample_accession")
+    try:
+        sample_accession = int(sample_accession)
+    except ValueError as exc:
+        return api_error(f"Invalid sample_accession value: {exc}")
+
+    with api_registry() as registry:
+        full_sample = registry.get_full_sample(sample_accession)
+
+    return jsonify(
+        {
+            "status": "ok",
+            "sample": (
+                api_model_to_dict(full_sample["sample"]) if full_sample else None
+            ),
+            "annotations": (
+                [
+                    api_model_to_dict(annotation)
+                    for annotation in full_sample["annotations"]
+                ]
+                if full_sample
+                else []
+            ),
+        }
+    )
+
+
 @app.route("/description")
 def show_description():
     return render_template("description.html")

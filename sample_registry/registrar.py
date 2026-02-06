@@ -103,6 +103,51 @@ class SampleRegistry:
             ).all()
         )
 
+    def get_full_sample(self, sample_accession: int) -> dict | None:
+        """Return a sample and all of its annotations."""
+
+        sample = self.session.scalar(
+            select(Sample).where(Sample.sample_accession == sample_accession)
+        )
+        if not sample:
+            return None
+
+        annotations = self.get_annotations(sample_accession)
+        return {"sample": sample, "annotations": annotations}
+
+    def get_full_run(self, run_accession: int) -> dict | None:
+        """Return a run with all samples and per-sample annotations."""
+
+        run = self.get_run(run_accession)
+        if not run:
+            return None
+
+        samples = self.get_samples(run_accession)
+        sample_accessions = [sample.sample_accession for sample in samples]
+        annotations = []
+        if sample_accessions:
+            annotations = list(
+                self.session.scalars(
+                    select(Annotation).where(
+                        Annotation.sample_accession.in_(sample_accessions)
+                    )
+                ).all()
+            )
+
+        annotations_by_sample_accession: dict[int, list[Annotation]] = {
+            sample_accession: [] for sample_accession in sample_accessions
+        }
+        for annotation in annotations:
+            annotations_by_sample_accession[annotation.sample_accession].append(
+                annotation
+            )
+
+        return {
+            "run": run,
+            "samples": samples,
+            "annotations_by_sample_accession": annotations_by_sample_accession,
+        }
+
     def register_run(
         self,
         run_date: str,
