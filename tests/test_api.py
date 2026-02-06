@@ -310,9 +310,7 @@ def test_api_get_full_run(api_client):
 
 def test_api_get_full_sample(api_client):
     client, _ = api_client
-    response = client.get(
-        "/api/get_full_sample", query_string={"sample_accession": 1}
-    )
+    response = client.get("/api/get_full_sample", query_string={"sample_accession": 1})
     assert response.status_code == 200
     payload = response.get_json()
     assert payload["status"] == "ok"

@@ -124,15 +124,17 @@ class SampleRegistry:
 
         samples = self.get_samples(run_accession)
         sample_accessions = [sample.sample_accession for sample in samples]
-        annotations = []
-        if sample_accessions:
-            annotations = list(
-                self.session.scalars(
-                    select(Annotation).where(
-                        Annotation.sample_accession.in_(sample_accessions)
-                    )
-                ).all()
-            )
+
+        annotations = list(
+            self.session.scalars(
+                select(Annotation)
+                .join(
+                    Sample,
+                    Annotation.sample_accession == Sample.sample_accession,
+                )
+                .where(Sample.run_accession == run_accession)
+            ).all()
+        )
 
         annotations_by_sample_accession: dict[int, list[Annotation]] = {
             sample_accession: [] for sample_accession in sample_accessions
