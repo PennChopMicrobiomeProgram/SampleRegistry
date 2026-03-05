@@ -94,6 +94,13 @@ Typical workflow:
 register_run /path/to/run.fastq.gz --date 2024-09-25 --comment "MiSeq run"
 
 # 2) register samples and annotations from a metadata table
+# IF USING PODMAN:
+# Temporarily copy the sample metadata table to this directory: mbiome.research.chop.edu:/var/local/sample_registry
+# This path is where podman can find files and is mapped to '/data/'
+register_samples <run_accession> /data/sample_metadata.tsv
+register_annotations <run_accession> /data/sample_metadata.tsv
+
+# If using local CLI, simply use the relative path to the run's sample metadata table tsv:
 register_samples <run_accession> sample_metadata.tsv
 register_annotations <run_accession> sample_metadata.tsv
 
