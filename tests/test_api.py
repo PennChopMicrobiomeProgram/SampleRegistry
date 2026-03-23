@@ -288,6 +288,40 @@ def test_api_get_annotations(api_client):
     ]
 
 
+def test_api_get_full_run(api_client):
+    client, _ = api_client
+    response = client.get("/api/get_full_run", query_string={"run_accession": 1})
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["status"] == "ok"
+    assert payload["run"]["run_accession"] == 1
+    samples = sorted(
+        payload["samples"], key=lambda item: item["sample"]["sample_accession"]
+    )
+    assert [item["sample"]["sample_accession"] for item in samples] == [1, 2]
+    sample_1_annotations = sorted(
+        samples[0]["annotations"], key=lambda item: item["key"]
+    )
+    assert sample_1_annotations == [
+        {"sample_accession": 1, "key": "key0", "val": "val0"},
+        {"sample_accession": 1, "key": "key4", "val": "val0"},
+    ]
+
+
+def test_api_get_full_sample(api_client):
+    client, _ = api_client
+    response = client.get("/api/get_full_sample", query_string={"sample_accession": 1})
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["status"] == "ok"
+    assert payload["sample"]["sample_accession"] == 1
+    annotations = sorted(payload["annotations"], key=lambda item: item["key"])
+    assert annotations == [
+        {"sample_accession": 1, "key": "key0", "val": "val0"},
+        {"sample_accession": 1, "key": "key4", "val": "val0"},
+    ]
+
+
 def test_api_modify_annotation(api_client):
     client, Session = api_client
     response = client.post(

@@ -1,6 +1,6 @@
 from typing import Generator
 import pytest
-from sqlalchemy import create_engine, func, select
+from sqlalchemy import create_engine, func, insert, select
 from sqlalchemy.orm import Session, sessionmaker
 from sample_registry.db import create_test_db
 from sample_registry.mapping import SampleTable
@@ -68,6 +68,56 @@ def test_get_runs_by_data_uri(db):
     assert registry.get_runs_by_data_uri("run1") == [1]
     assert registry.get_runs_by_data_uri("raw_data") == [1, 2, 3]
     assert registry.get_runs_by_data_uri("not-a-uri") == []
+
+
+def test_get_full_run_handles_large_sample_sets(db):
+    registry = SampleRegistry(db)
+    run_accession = registry.register_run(
+        "2025-01-01",
+        "Illumina-MiSeq",
+        "Nextera XT",
+        1,
+        "raw_data/run4/Undetermined_S0_L001_R1_001.fastq.gz",
+        "large run",
+    )
+
+    sample_count = 1100
+    start_accession = db.scalar(select(func.max(Sample.sample_accession))) + 1
+    sample_rows = [
+        {
+            "sample_accession": start_accession + i,
+            "sample_name": f"BulkSample{i}",
+            "run_accession": run_accession,
+            "barcode_sequence": f"BC{i:04d}",
+            "primer_sequence": None,
+            "sample_type": None,
+            "subject_id": None,
+            "host_species": None,
+        }
+        for i in range(sample_count)
+    ]
+    db.execute(insert(Sample).values(sample_rows))
+
+    annotation_rows = [
+        {
+            "sample_accession": start_accession + i,
+            "key": "bulk_key",
+            "val": f"bulk_val_{i}",
+        }
+        for i in range(sample_count)
+    ]
+    db.execute(insert(Annotation).values(annotation_rows))
+    db.commit()
+
+    full_run = registry.get_full_run(run_accession)
+
+    assert full_run["run"].run_accession == run_accession
+    assert len(full_run["samples"]) == sample_count
+    assert len(full_run["annotations_by_sample_accession"]) == sample_count
+    assert all(
+        len(sample_annotations) == 1
+        for sample_annotations in full_run["annotations_by_sample_accession"].values()
+    )
 
 
 def test_check_run_accession_doesnt_exist(db):
