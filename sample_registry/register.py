@@ -66,7 +66,7 @@ def register_sample_annotations(
             description=ANNOTATIONS_DESC, epilog=ANNOTATIONS_EPILOG
         )
     p.add_argument("run_accession", type=int, help="Run accession number")
-    p.add_argument("sample_table", type=argparse.FileType("r"), help=SAMPLE_TABLE_HELP)
+    p.add_argument("sample_table", help=SAMPLE_TABLE_HELP)
     args = p.parse_args(argv)
 
     registry = SampleRegistry(session)
@@ -74,7 +74,8 @@ def register_sample_annotations(
     if register_samples:
         registry.check_samples(args.run_accession, exists=False)
 
-    sample_table = SampleTable.load(args.sample_table)
+    with open(args.sample_table) as f:
+        sample_table = SampleTable.load(f)
     sample_table.look_up_nextera_barcodes()
     sample_table.validate()
 
