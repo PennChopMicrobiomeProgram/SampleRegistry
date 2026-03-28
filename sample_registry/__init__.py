@@ -30,26 +30,13 @@ NULL_VALUES: list[Optional[str]] = [
 def sample_registry_version():
     sys.stderr.write(__version__)
 
-
-try:
-    SQLALCHEMY_DATABASE_URI = os.environ["SAMPLE_REGISTRY_DB_URI"]
-except KeyError:
+SQLALCHEMY_DATABASE_URI = os.environ.get("SAMPLE_REGISTRY_DB_URI")
+if SQLALCHEMY_DATABASE_URI is None:
     sys.stdout.write(
-        "Missing database connection information in environment, using test SQLite database\n"
-    )
-    SQLALCHEMY_DATABASE_URI = (
-        f"sqlite:///{Path(__file__).parent.parent.resolve()}/sample_registry.sqlite"
-    )
-
-
-if "PYTEST_VERSION" in os.environ:
-    # Set SQLALCHEMY_DATABASE_URI to an in-memory SQLite database for testing
+        "SAMPLE_REGISTRY_DB_URI not defined in environment, "
+        "using in-memory SQLite database\n")
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
 
-
-sys.stderr.write(f"Connecting to database at {SQLALCHEMY_DATABASE_URI}\n")
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
-
-# Create database session
 Session = sessionmaker(bind=engine)
 session = Session()
