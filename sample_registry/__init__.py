@@ -31,7 +31,8 @@ def sample_registry_version():
     sys.stderr.write(__version__)
 
 SQLALCHEMY_DATABASE_URI = os.environ.get("SAMPLE_REGISTRY_DB_URI")
-if SQLALCHEMY_DATABASE_URI is None:
+DATABASE_URI_MISSING = SQLALCHEMY_DATABASE_URI is None
+if DATABASE_URI_MISSING:
     sys.stdout.write(
         "SAMPLE_REGISTRY_DB_URI not defined in environment, "
         "using in-memory SQLite database\n")

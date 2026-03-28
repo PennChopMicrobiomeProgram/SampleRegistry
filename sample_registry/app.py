@@ -18,7 +18,10 @@ from flask_sqlalchemy import SQLAlchemy
 from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
-from sample_registry import ARCHIVE_ROOT, SQLALCHEMY_DATABASE_URI
+import sys
+from sample_registry import (
+    ARCHIVE_ROOT, SQLALCHEMY_DATABASE_URI, DATABASE_URI_MISSING,
+    )
 from sample_registry.mapping import SampleTable
 from sample_registry.models import Base, Annotation, Run, Sample
 from sample_registry.db import run_to_dataframe, query_tag_stats, STANDARD_TAGS
@@ -47,6 +50,11 @@ db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 write_engine = create_engine(SQLALCHEMY_WRITE_URI, echo=False)
 WriteSession = sessionmaker(bind=write_engine)
+
+if DATABASE_URI_MISSING:
+    sys.stderr.write("Creating tables...\n")
+    with app.app_context():
+        db.create_all()
 
 
 @contextmanager
