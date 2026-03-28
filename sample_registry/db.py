@@ -30,15 +30,6 @@ NULL_VALUES: list[Optional[str]] = [
 ]
 
 
-def create_test_db(session: Optional[sessionmaker] = None):
-    if not session:
-        from sample_registry import engine
-        from sample_registry import session as imported_session
-
-        session = imported_session
-        Base.metadata.create_all(engine)
-    load_test_data(session)
-
 def load_test_data(session):
     if session.query(Run).count() > 0:
         sys.stderr.write(
