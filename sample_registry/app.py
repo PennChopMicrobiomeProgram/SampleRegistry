@@ -18,16 +18,43 @@ from flask_sqlalchemy import SQLAlchemy
 from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
-from sample_registry import ARCHIVE_ROOT, SQLALCHEMY_DATABASE_URI
+import sys
 from sample_registry.mapping import SampleTable
 from sample_registry.models import Base, Annotation, Run, Sample
-from sample_registry.db import run_to_dataframe, query_tag_stats, STANDARD_TAGS
+from sample_registry.db import (
+    run_to_dataframe,
+    query_tag_stats,
+    STANDARD_TAGS,
+    load_test_data,
+)
 from sample_registry.registrar import SampleRegistry
 from sample_registry.standards import STANDARD_HOST_SPECIES, STANDARD_SAMPLE_TYPES
 from typing import Optional
 from werkzeug.middleware.proxy_fix import ProxyFix
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+# Define archive root path
+ARCHIVE_ROOT = Path(
+    os.environ.get("SAMPLE_REGISTRY_ARCHIVE_ROOT", "/mnt/isilon/microbiome/")
+)
+
+SQLALCHEMY_DATABASE_URI = os.environ.get("SAMPLE_REGISTRY_DB_URI")
+DATABASE_URI_MISSING = SQLALCHEMY_DATABASE_URI is None
+if DATABASE_URI_MISSING:
+    if os.environ.get("PYTEST_VERSION"):
+        SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    else:
+        dev_db_fp = Path(__file__).parent.parent.resolve() / "sample_registry.sqlite"
+        sys.stdout.write(
+            f"SAMPLE_REGISTRY_DB_URI not defined in environment, "
+            f"using SQLite database at {dev_db_fp}\n"
+        )
+        SQLALCHEMY_DATABASE_URI = f"sqlite:///{dev_db_fp}"
+
+engine = create_engine(SQLALCHEMY_DATABASE_URI)
+Session = sessionmaker(bind=engine)
+session = Session()
 
 app = Flask(__name__)
 app.secret_key = os.urandom(12)
@@ -47,6 +74,13 @@ db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 write_engine = create_engine(SQLALCHEMY_WRITE_URI, echo=False)
 WriteSession = sessionmaker(bind=write_engine)
+
+if DATABASE_URI_MISSING:
+    sys.stderr.write("Creating tables...\n")
+    with app.app_context():
+        db.create_all()
+    with WriteSession() as session:
+        load_test_data(session)
 
 
 @contextmanager
