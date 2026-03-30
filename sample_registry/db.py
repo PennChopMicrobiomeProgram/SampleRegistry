@@ -32,9 +32,7 @@ NULL_VALUES: list[Optional[str]] = [
 
 def load_test_data(session):
     if session.query(Run).count() > 0:
-        sys.stderr.write(
-            "Database already contains data, skipping data load.\n"
-        )
+        sys.stderr.write("Database already contains data, skipping data load.\n")
         return
 
     run1 = Run(

@@ -6,5 +6,3 @@ from sqlalchemy.orm import sessionmaker
 from typing import Optional
 
 __version__ = "1.4.1"
-
-

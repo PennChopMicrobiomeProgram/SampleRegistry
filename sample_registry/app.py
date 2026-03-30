@@ -22,9 +22,11 @@ import sys
 from sample_registry.mapping import SampleTable
 from sample_registry.models import Base, Annotation, Run, Sample
 from sample_registry.db import (
-    run_to_dataframe, query_tag_stats, STANDARD_TAGS,
+    run_to_dataframe,
+    query_tag_stats,
+    STANDARD_TAGS,
     load_test_data,
-    )
+)
 from sample_registry.registrar import SampleRegistry
 from sample_registry.standards import STANDARD_HOST_SPECIES, STANDARD_SAMPLE_TYPES
 from typing import Optional
@@ -40,16 +42,14 @@ ARCHIVE_ROOT = Path(
 SQLALCHEMY_DATABASE_URI = os.environ.get("SAMPLE_REGISTRY_DB_URI")
 DATABASE_URI_MISSING = SQLALCHEMY_DATABASE_URI is None
 if DATABASE_URI_MISSING:
-    if os.environ.get('PYTEST_VERSION'):
+    if os.environ.get("PYTEST_VERSION"):
         SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     else:
-        dev_db_fp = (
-            Path(__file__).parent.parent.resolve() /
-            "sample_registry.sqlite"
-            )
+        dev_db_fp = Path(__file__).parent.parent.resolve() / "sample_registry.sqlite"
         sys.stdout.write(
             f"SAMPLE_REGISTRY_DB_URI not defined in environment, "
-            f"using SQLite database at {dev_db_fp}\n")
+            f"using SQLite database at {dev_db_fp}\n"
+        )
         SQLALCHEMY_DATABASE_URI = f"sqlite:///{dev_db_fp}"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
@@ -81,6 +81,7 @@ if DATABASE_URI_MISSING:
         db.create_all()
     with WriteSession() as session:
         load_test_data(session)
+
 
 @contextmanager
 def api_registry():
