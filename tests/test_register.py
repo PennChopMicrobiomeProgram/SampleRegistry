@@ -6,7 +6,7 @@ import tempfile
 from sqlalchemy import and_, create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 from typing import Generator
-from sample_registry.db import create_test_db
+from sample_registry.db import load_test_data
 from sample_registry.mapping import SampleTable
 from sample_registry.models import (
     Annotation,
@@ -69,7 +69,7 @@ def db() -> Generator[Session, None, None]:
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    create_test_db(session)
+    load_test_data(session)
 
     yield session
 

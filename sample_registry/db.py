@@ -2,7 +2,6 @@ import sys
 from typing import Optional
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import sessionmaker
-from sample_registry import NULL_VALUES
 from sample_registry.models import (
     Base,
     Run,
@@ -16,20 +15,25 @@ STANDARD_TAGS: dict[str, str] = {
     "HostSpecies": "host_species",
 }
 
+# Doesn't include "NA" because that's what we fill in for missing values
+NULL_VALUES: list[Optional[str]] = [
+    None,
+    "",
+    "null",
+    "NULL",
+    "None",
+    "none",
+    "NONE",
+    "N/A",
+    "n/a",
+    "na",
+]
 
-def create_test_db(session: Optional[sessionmaker] = None):
-    if not session:
-        from sample_registry import engine
-        from sample_registry import session as imported_session
 
-        session = imported_session
-        Base.metadata.create_all(engine)
-
+def load_test_data(session):
     if session.query(Run).count() > 0:
-        sys.stderr.write(
-            "Database already contains data, please delete any existing test database before running this command"
-        )
-        sys.exit(1)
+        sys.stderr.write("Database already contains data, skipping data load.\n")
+        return
 
     run1 = Run(
         run_accession=1,

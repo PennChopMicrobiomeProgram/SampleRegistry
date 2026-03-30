@@ -51,8 +51,8 @@ def api_client(tmp_path, monkeypatch):
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
     session = Session()
-    create_test_db = importlib.import_module("sample_registry.db").create_test_db
-    create_test_db(session)
+    load_test_data = importlib.import_module("sample_registry.db").load_test_data
+    load_test_data(session)
     session.close()
 
     sample_registry = importlib.import_module("sample_registry")
