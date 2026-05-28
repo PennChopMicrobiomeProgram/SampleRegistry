@@ -159,18 +159,21 @@ curl -G "https://mbiome.research.chop.edu/sample_registry/api/get_run" \
 # Get all samples for a run
 curl -G "https://mbiome.research.chop.edu/sample_registry/api/get_samples" \
   --data-urlencode "run_accession=1638"
+
+
 ```
 
 For metadata-table endpoints (`register_samples` and `register_annotations`), provide either:
 
 - a JSON payload with a `sample_table` key containing tab-delimited data, or
 - `multipart/form-data` with a file upload.
+```bash
 # register samples using tsv metadata
 curl -X POST "https://mbiome.research.chop.edu/sample_registry/api/register_samples" \
   -H "Content-Type: application/json" \
   -d "$(python3 -c 'import json; print(json.dumps({"run_accession": 1697, "sample_table": open("mapping.tsv").read()}))')" 
   # make sure mapping.tsv is in your current dir where you run the command
-
+```
 
 On success, endpoints return `{"status": "ok", ...}`. Validation errors return `{"status": "error", "error": "..."}` with HTTP 400.
 
