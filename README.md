@@ -166,14 +166,7 @@ curl -G "https://mbiome.research.chop.edu/sample_registry/api/get_samples" \
 For metadata-table endpoints (`register_samples` and `register_annotations`), provide either:
 
 - a JSON payload with a `sample_table` key containing tab-delimited data, or
-- `multipart/form-data` with a file upload.
 ```bash
-# register samples using tsv metadata (this works if samples are less than 4 plates)
-curl -X POST "https://mbiome.research.chop.edu/sample_registry/api/register_samples" \
-  -H "Content-Type: application/json" \
-  -d "$(python3 -c 'import json; print(json.dumps({"run_accession": 1697, "sample_table": open("mapping.tsv").read()}))')" 
-  # make sure mapping.tsv is in your current dir where you run the command
-
 # Use this if you have 4 plates of samples
 # Paste this into command line, this is to creat a file named payload.json with run_accessin 1719 and corresponding metadata, make sure to change it to your run_accession and metadata
 python3 - <<'PY'
@@ -192,6 +185,14 @@ curl -X POST \
   "https://mbiome.research.chop.edu/sample_registry/api/register_samples" \
   -H "Content-Type: application/json" \
   --data-binary @payload.json
+```
+- `multipart/form-data` with a file upload.
+```bash
+# register samples using tsv metadata (this works if samples are less than 4 plates)
+curl -X POST "https://mbiome.research.chop.edu/sample_registry/api/register_samples" \
+  -H "Content-Type: application/json" \
+  -d "$(python3 -c 'import json; print(json.dumps({"run_accession": 1697, "sample_table": open("mapping.tsv").read()}))')" 
+  # make sure mapping.tsv is in your current dir where you run the command
 ```
 
 On success, endpoints return `{"status": "ok", ...}`. Validation errors return `{"status": "error", "error": "..."}` with HTTP 400.
